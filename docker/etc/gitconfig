@@ -1,0 +1,18 @@
+[url "https://github.com"]
+	insteadOf = git://github.com
+[url "https://yoctoproject.org"]
+	insteadOf = git://yoctoproject.org
+[url "https://sourceware.org"]
+	insteadOf = git://sourceware.org
+[url "https://golang.org"]
+	insteadOf = git://golang.org
+[url "https://kernel.org"]
+	insteadOf = git://kernel.org
+[url "https://googlesource.com"]
+	insteadOf = git://googlesource.com
+[url "https://sourceforge.net"]
+	insteadOf = git://sourceforge.net
+[url "https://gitlab.com"]
+	insteadOf = git://gitlab.com
+[safe]
+	directory = *
