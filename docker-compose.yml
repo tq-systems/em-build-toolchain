@@ -1,0 +1,37 @@
+services:
+  common:
+    build:
+      context: .
+      dockerfile: docker/common.Dockerfile
+      args:
+        - PUBLIC_TOOLCHAIN_REGISTRY=${PUBLIC_TOOLCHAIN_REGISTRY}
+        - BASE_REGISTRY=${BASE_REGISTRY}
+        - BASE_DOCKER_TAG=${BASE_DOCKER_TAG}
+        - DOCKER_USER=${DOCKER_USER}
+    image: ${PUBLIC_TOOLCHAIN_REGISTRY}/common:${BUILD_TAG}
+
+  amd64:
+    build:
+      context: .
+      dockerfile: docker/amd64.Dockerfile
+      args:
+        - PUBLIC_TOOLCHAIN_REGISTRY=${PUBLIC_TOOLCHAIN_REGISTRY}
+        - BUILD_TAG=${BUILD_TAG}
+        - DOCKER_USER=${DOCKER_USER}
+        - GOPRIVATE=${GOPRIVATE}
+        - PATH_AARCH64_TOOLCHAIN=${PATH_AARCH64_TOOLCHAIN}
+    image: ${PUBLIC_TOOLCHAIN_REGISTRY}/amd64:${BUILD_TAG}
+
+  aarch64:
+    build:
+      context: .
+      dockerfile: docker/aarch64.Dockerfile
+      args:
+        - PUBLIC_TOOLCHAIN_REGISTRY=${PUBLIC_TOOLCHAIN_REGISTRY}
+        - BUILD_TAG=${BUILD_TAG}
+        - DOCKER_USER=${DOCKER_USER}
+        - GOPRIVATE=${GOPRIVATE}
+        - PATH_AARCH64_TOOLCHAIN=${PATH_AARCH64_TOOLCHAIN}
+        - PATH_EM_AARCH64_BOOTLOADER=${PATH_EM_AARCH64_BOOTLOADER}
+        - PATH_EM_AARCH64_CORE_IMAGE=${PATH_EM_AARCH64_CORE_IMAGE}
+    image: ${PUBLIC_TOOLCHAIN_REGISTRY}/aarch64:${BUILD_TAG}

@@ -1,0 +1,69 @@
+
+include:
+- project: tq-em/public/build/base
+  file: ci/include.yml
+  ref: main
+
+stages:
+  - test
+  - common
+  - amd64
+  - otherimages
+
+.docker-build:
+  extends:
+    - .image-docker
+    - .before-script-docker-login
+
+shell linter:
+  extends:
+    - .lint-shell
+    - .rule-include-development-branches
+  script:
+    - lint.sh shell -d scripts
+
+test all builds:
+  extends:
+    - .docker-build
+    - .rule-include-development-branches
+  stage: test
+  variables:
+    BUILD_TAG: test-next
+  script: |
+    make all
+    if [ "$DEPLOY_TEST_IMAGES" = "true" ]; then
+      make test-release BUILD_TAG=${BUILD_TAG}
+    fi
+
+gitleaks:
+  extends: .gitleaks
+
+# Build and push docker images
+common image:
+  extends:
+    - .docker-build
+    - .rule-include-default-branch-or-tags
+  stage: common
+  script:
+    - make release IMAGE=common
+
+amd64 image:
+  extends:
+    - .docker-build
+    - .rule-include-default-branch-or-tags
+  stage: amd64
+  script:
+    - make release IMAGE=amd64
+
+other images:
+  extends:
+    - .docker-build
+    - .rule-include-default-branch-or-tags
+  stage: otherimages
+  parallel:
+    matrix:
+      - PROVIDER: docker
+        STACK:
+          - aarch64
+  script:
+    - make release IMAGE=${STACK}

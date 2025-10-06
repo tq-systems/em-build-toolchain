@@ -1,0 +1,3 @@
+# Use union merge strategy for CHANGELOG files
+CHANGELOG.md merge=union
+CHANGELOG.md.in merge=union
