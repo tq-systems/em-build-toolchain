@@ -1,0 +1,23 @@
+.simple-deploy:
+  stage: deploy
+  cache:
+    policy: pull
+  extends:
+    - .image-amd64
+  variables:
+    GITLAB_RUNNER_TAG: tqem-deploy-snapshots
+    MAKE_TARGET: deploy-snapshot
+  script:
+    - make ${MAKE_TARGET}
+  rules:
+    # Release with semantic version
+    - if: '$CI_COMMIT_TAG =~ /^v[0-9]+\.[0-9]+\.[0-9]+$/'
+      variables:
+        MAKE_TARGET: deploy-release
+        TQEM_BUILD_TYPE_DIRNAME: releases
+    # Release-Candidate with semantic version and suffix
+    - if: '$CI_COMMIT_TAG =~ /^v[0-9]+\.[0-9]+\.[0-9]+-.+$/'
+      variables:
+        MAKE_TARGET: deploy-release
+        TQEM_BUILD_TYPE_DIRNAME: release-candidates
+    - when: on_success

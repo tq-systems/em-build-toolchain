@@ -1,0 +1,12 @@
+# IMAGES
+variables:
+  PUBLIC_TOOLCHAIN_DOCKER_TAG: 'latest'
+
+# amd64 is the default image, set all other image templates only once here
+.image-amd64:
+  image: ${PUBLIC_TOOLCHAIN_REGISTRY}/amd64:${PUBLIC_TOOLCHAIN_DOCKER_TAG}
+
+.image-aarch64:
+  image: ${PUBLIC_TOOLCHAIN_REGISTRY}/aarch64:${PUBLIC_TOOLCHAIN_DOCKER_TAG}
+
+image: !reference [.image-amd64, image]

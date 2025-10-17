@@ -1,0 +1,14 @@
+Prepare Bundle Build:
+  stage: prepare
+  extends:
+    - .artifacts-one-week
+    - .image-aarch64
+  script: make prepare
+
+.build-aarch64-bundle:
+  stage: build
+  extends:
+    - .artifacts-one-week
+    - .image-aarch64
+  script:
+    - make build

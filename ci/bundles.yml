@@ -1,0 +1,10 @@
+include:
+  - local: 'ci/common/include.yml'
+  - local: 'ci/bundles/build.yml'
+
+# Deploy stage is handled by ci/common/deploy.yml
+
+stages:
+  - prepare
+  - build
+  - deploy

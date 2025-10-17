@@ -1,0 +1,25 @@
+.prepare-app-build:
+  stage: prepare
+  extends:
+    - .artifacts-always-one-day
+    - .image-aarch64
+  script:
+    - make deps
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: never
+    - when: always
+
+.build-aarch64-app:
+  stage: build
+  extends:
+    - .artifacts-always-one-week
+    - .image-aarch64
+  before_script:
+    - make deps-extract
+  script:
+    - make all
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: never
+    - when: on_success
