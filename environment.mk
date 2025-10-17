@@ -13,6 +13,8 @@ endif
 
 # .env file is read by docker-compose
 export DOCKER_COMPOSE_ENV = .env
+export DOCKER_COMPOSE_BASE_ENV = .base_env
+export DOCKER_COMPOSE_FILES_ENV = .files_env
 export TQEM_TMP_PATH = tmp
 
 # Default strings, if no docker registry images are defined

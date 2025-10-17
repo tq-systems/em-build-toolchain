@@ -21,19 +21,16 @@ log_error_and_exit() {
 }
 
 set_base_env() {
-	if [ -e "$DOCKER_COMPOSE_ENV" ]; then
-		echo "Using existing $DOCKER_COMPOSE_ENV file"
+	if [ -e "$DOCKER_COMPOSE_BASE_ENV" ]; then
+		echo "Using existing $DOCKER_COMPOSE_BASE_ENV file"
 		exit 0
 	fi
 
-	echo "$DOCKER_COMPOSE_ENV_CONTENT" > "$DOCKER_COMPOSE_ENV"
+	echo "$DOCKER_COMPOSE_ENV_CONTENT" > "$DOCKER_COMPOSE_BASE_ENV"
 
 	if [ -n "$GOPRIVATE" ]; then
-		echo "GOPRIVATE=$GOPRIVATE" >> "$DOCKER_COMPOSE_ENV"
+		echo "GOPRIVATE=$GOPRIVATE" >> "$DOCKER_COMPOSE_BASE_ENV"
 	fi
-
-	# Improve overview by adding a newline
-	echo "" >> "$DOCKER_COMPOSE_ENV"
 }
 
 provide_file() {
@@ -55,15 +52,17 @@ provide_file() {
 		else
 			log_error_and_exit "Missing file: $source_path"
 		fi
-
-		# Add variable to the Docker Compose environment file
-		echo "$variable=./$TQEM_TMP_PATH/$file" >> "$DOCKER_COMPOSE_ENV"
 	fi
+
+	# Add variable to the Docker Compose environment file
+	echo "$variable=./$TQEM_TMP_PATH/$file" >> "$DOCKER_COMPOSE_FILES_ENV"
 }
 
 provide_all_files() {
-	[ -e "$DOCKER_COMPOSE_ENV" ] || log_error_and_exit "Missing $DOCKER_COMPOSE_ENV."
-
+	if [ -e "$DOCKER_COMPOSE_FILES_ENV" ]; then
+		echo "Using existing $DOCKER_COMPOSE_FILES_ENV file"
+		exit 0
+	fi
 
 	provide_file PATH_AARCH64_TOOLCHAIN     "$FILE_AARCH64_TOOLCHAIN"     toolchain/aarch64
 	provide_file PATH_EM_AARCH64_BOOTLOADER "$FILE_EM_AARCH64_BOOTLOADER" core-image/em-aarch64

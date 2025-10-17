@@ -10,7 +10,7 @@ go-deps:
 	cd ${DIR_BACKEND} && go mod vendor
 
 go-deps-extract:
-	rm -rf ./${DIR_BACKEND_REL}/vendor && tar xzf ${TQEM_ARTIFACTS_PATH}/${BUILD_ARCHIVE} ./${DIR_BACKEND_REL}/vendor
+	rm -rf ./${DIR_BACKEND_REL}/vendor && tar xzf ${TQEM_DEPLOY_PATH}/${BUILD_ARCHIVE} ./${DIR_BACKEND_REL}/vendor
 
 define GO_DEBUG
 go-debug-$(1):

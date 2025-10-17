@@ -1,6 +1,7 @@
 include $(CURDIR)/environment.mk
 
-all: prepare ${IMAGE}
+all: prepare
+	$(MAKE) ${IMAGE}
 
 prepare-env:
 	./prepare.sh env ${EM_BUILD_REF}
@@ -12,6 +13,7 @@ prepare-tmp:
 prepare:
 	$(MAKE) prepare-env
 	$(MAKE) prepare-tmp
+	cat ${DOCKER_COMPOSE_BASE_ENV} ${DOCKER_COMPOSE_FILES_ENV} > ${DOCKER_COMPOSE_ENV}
 
 common: prepare
 	${DOCKER_COMPOSE} common
@@ -31,7 +33,13 @@ endif
 pull: prepare-env
 	docker compose ${COMPOSE_FILE} pull ${IMAGE}
 
-clean-env:
+clean-base-env:
+	rm -f ${DOCKER_COMPOSE_BASE_ENV}
+
+clean-files-env:
+	rm -f ${DOCKER_COMPOSE_FILES_ENV}
+
+clean-env: clean-base-env clean-files-env
 	rm -f ${DOCKER_COMPOSE_ENV}
 
 clean-tmp:
@@ -53,7 +61,7 @@ ifneq (,$(shell echo "${BUILD_TAG}" | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+'))
 endif
 
 # Explicitly skip 'clean-tmp' target to enable exchanging files in tmp directory
-test-release: check-tag clean-env
+test-release: check-tag clean-base-env
 	$(MAKE) all
 	$(MAKE) push clean-system
 
@@ -65,5 +73,5 @@ release: clean-env clean-tmp
 .PHONY: all $(IMAGE) \
 	prepare-env prepare-tmp prepare \
 	push pull \
-	clean-env clean-tmp clean-system clean \
-	release check-tag test-release \
+	clean-base-env clean-files-env clean-env clean-tmp clean-system clean \
+	check-tag test-release release

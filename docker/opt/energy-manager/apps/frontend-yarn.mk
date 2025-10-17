@@ -28,7 +28,7 @@ yarn-deps:
 	cd ${DIR_FRONTEND} && $(YARN_INSTALL_CMD)
 
 yarn-deps-extract:
-	rm -rf ./${DIR_FRONTEND_REL}/node_modules && tar xzf ${TQEM_ARTIFACTS_PATH}/${BUILD_ARCHIVE} ./${DIR_FRONTEND_REL}/node_modules
+	rm -rf ./${DIR_FRONTEND_REL}/node_modules && tar xzf ${TQEM_DEPLOY_PATH}/${BUILD_ARCHIVE} ./${DIR_FRONTEND_REL}/node_modules
 
 yarn-test-unit: yarn-deps
 	cd ${DIR_FRONTEND} && yarn test:unit

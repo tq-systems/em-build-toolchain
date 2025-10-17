@@ -18,9 +18,10 @@ export TQEM_TMP_PATH          = ${TQEM_PROJECT_ROOT_PATH}/${TQEM_TMP_DIRNAME}
 export TQEM_BASE_DEPLOY_PATH    ?= $(HOME)/workspace/tqem/deploy
 export TQEM_APPS_DEPLOY_PATH    ?= ${TQEM_BASE_DEPLOY_PATH}/${TQEM_BUILD_TYPE_DIRNAME}/apps
 export TQEM_BUNDLES_DEPLOY_PATH ?= ${TQEM_BASE_DEPLOY_PATH}/${TQEM_BUILD_TYPE_DIRNAME}/bundles
+export TQEM_APPS_CACHE_PATH     ?= $(HOME)/workspace/tqem/cache/apps
 
 # Variables
-export TQEM_GIT_REFERENCE ?= $(shell git branch --show-current || echo 'main')
-
-export TQEM_PROJECT_URL  ?= $(shell git remote get-url origin)
-export TQEM_PROJECT_NAME ?= $(shell basename "${TQEM_PROJECT_URL}" .git)
+export TQEM_GIT_REFERENCE ?= $(shell git describe --exact-match --tags HEAD 2>/dev/null \
+	|| git branch --show-current 2>/dev/null || git rev-parse --short HEAD)
+export TQEM_PROJECT_URL   ?= $(shell git remote get-url origin)
+export TQEM_PROJECT_NAME  ?= $(shell basename "${TQEM_PROJECT_URL}" .git)
