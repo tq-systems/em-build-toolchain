@@ -84,6 +84,9 @@ A release build is triggered by pushing a tag.
 The requirement for a successful build is that the artifacts to be installed
 are already built and accessible in the desired version.
 
+A release commit updates the changelogs and the `PUBLIC_TOOLCHAIN_DOCKER_TAG`
+variable in the `ci/common/images.yml` file.
+
 ### Git
 The git tags of this project feature semantic versioning for this project.
 Their pattern is `vX.Y.Z` in which X is the major version, Y is the minor

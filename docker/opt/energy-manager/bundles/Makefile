@@ -10,17 +10,17 @@ RELEASE_BUNDLE_NAME ?= ${BUNDLE_NAME}-release
 # build.mk is included at last to have access to the common makefiles
 include /opt/energy-manager/bundles/build.mk
 
-all: build cache
+# deployment
+TQEM_DEPLOY_SOURCE_PATH ?= ${TQEM_DEPLOY_PATH}
+TQEM_DEPLOY_DESTINATION_PATH ?= ${TQEM_BUNDLES_DEPLOY_PATH}/${BUNDLE_NAME}/${TQEM_GIT_REFERENCE}
+include /opt/energy-manager/common/deploy.mk
 
-cache:
+all: build
 	tqem-copy.sh ${TQEM_DOWNLOADS_PATH} ${TQEM_APPS_CACHE_PATH} --overwrite
 
 prepare: version
 
-deploy:
-	tqem-copy.sh ${TQEM_DEPLOY_PATH} ${TQEM_BUNDLES_DEPLOY_PATH}/${BUNDLE_NAME}/${TQEM_GIT_REFERENCE}
-
 clean: clean-artifacts
 	rm -rf ${TQEM_DOWNLOADS_PATH} ${TQEM_TMP_PATH}
 
-.PHONY: all cache prepare deploy clean
+.PHONY: all cache prepare clean

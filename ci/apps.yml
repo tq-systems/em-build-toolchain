@@ -1,0 +1,20 @@
+include:
+  - local: 'ci/common/include.yml'
+  - local: 'ci/apps/build.yml'
+  - local: 'ci/apps/golang.yml'
+
+# Deploy stage is handled by ci/common/deploy.yml
+
+stages:
+  - prepare
+  - build
+  - test
+  - deploy
+
+default:
+  cache:
+    key: ${CI_COMMIT_REF_NAME}
+    paths:
+      - backend/vendor/
+      - frontend/node_modules/
+      - cache/

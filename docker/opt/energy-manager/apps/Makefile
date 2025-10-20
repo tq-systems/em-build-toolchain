@@ -5,6 +5,11 @@ include /opt/energy-manager/common/artifacts.mk
 export APP_ID  ?= ${TQEM_PROJECT_NAME}
 APP_NAME       ?= em-app-${APP_ID}
 
+# deployment
+TQEM_DEPLOY_SOURCE_PATH ?= ${TQEM_DEPLOY_PATH}
+TQEM_DEPLOY_DESTINATION_PATH ?= ${TQEM_APPS_DEPLOY_PATH}/${APP_ID}/${TQEM_GIT_REFERENCE}
+include /opt/energy-manager/common/deploy.mk
+
 DIR_APP_ROOT = /apps/installed/${APP_ID}
 DIR_PACKAGE  = ${TQEM_ARTIFACTS_PATH}/package
 
@@ -46,7 +51,6 @@ all: build
 # set empty targets here and override them in the included files
 backend-deps-fetch:
 backend-deps-extract:
-backend-prepare:
 backend-debug:
 backend-release:
 backend-finish:
@@ -58,7 +62,6 @@ backend: backend-release
 	$(MAKE) backend-finish
 frontend-deps-fetch:
 frontend-deps-extract:
-frontend-prepare:
 frontend-release:
 frontend-finish:
 frontend-foss-archive:
@@ -77,18 +80,19 @@ endif
 
 include /opt/energy-manager/apps/package.mk
 
-prepare: version frontend-prepare backend-prepare
+prepare: version
+	$(MAKE) backend-deps-fetch frontend-deps-fetch
 
 build: backend frontend
 	$(MAKE) empkg
 
 archive:
-	tar czf ${TQEM_ARTIFACTS_PATH}/${BUILD_ARCHIVE} -C ${TQEM_PROJECT_ROOT_PATH} \
-		--exclude-caches-all --exclude=./cache --exclude=artifacts --exclude=frontend/container .
+	tar czf ${TQEM_DEPLOY_PATH}/${BUILD_ARCHIVE} -C ${TQEM_PROJECT_ROOT_PATH} \
+		--exclude=artifacts --exclude=deploy --exclude=test --exclude=frontend/container \
+		--exclude-caches-all --exclude-vcs .
 
-deps-fetch: frontend-deps-fetch backend-deps-fetch
-
-deps: version deps-fetch archive
+deps: prepare
+	$(MAKE) archive
 
 deps-extract: frontend-deps-extract backend-deps-extract
 
@@ -96,17 +100,14 @@ foss-archive: frontend-foss-archive
 
 upgrade-deps: backend-upgrade frontend-upgrade
 
-deploy:
-	tqem-copy.sh ${TQEM_DEPLOY_PATH} ${TQEM_APPS_DEPLOY_PATH}/${APP_ID}/${TQEM_GIT_REFERENCE}
-
 package-clean:
 	rm -rf ${DIR_PACKAGE}
 
 clean: backend-clean frontend-clean clean-artifacts
 
 .PHONY: all prepare build \
-	backend-deps-fetch backend-deps-extract backend-prepare backend-debug backend-release \
+	backend-deps-fetch backend-deps-extract backend-debug backend-release \
 	backend-finish backend-clean backend-upgrade backend-dbg backend \
-	frontend-deps-fetch frontend-deps-extract frontend-prepare frontend-release frontend-finish \
+	frontend-deps-fetch frontend-deps-extract frontend-release frontend-finish \
 	frontend-foss-archive frontend-clean frontend-upgrade frontend \
-	archive deps-fetch deps deps-extract foss-archive upgrade-deps deploy package-clean clean
+	archive deps deps-extract foss-archive upgrade-deps package-clean clean
