@@ -45,7 +45,7 @@ Shell Linter:
     - .lint-shell
     - .rule-include-development-branches
   script:
-    - lint.sh shell -d scripts
+    - lint.sh shell
 
 Test All Builds:
   extends:
