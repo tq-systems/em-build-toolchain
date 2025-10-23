@@ -4,8 +4,8 @@
     policy: pull
   extends:
     - .image-amd64
+    - .gitlab-runner-tag
   variables:
-    GITLAB_RUNNER_TAG: tqem-deploy-snapshots
     MAKE_TARGET: deploy-snapshot
   script:
     - make ${MAKE_TARGET}
@@ -23,3 +23,6 @@
         MAKE_TARGET: deploy-release
         TQEM_BUILD_TYPE_DIRNAME: release-candidates
     - when: on_success
+  # For now the tags need to be set hard-coded to prevent issues with variables and trigger events
+  tags:
+    - tqem-deploy
