@@ -1,3 +1,0 @@
-default:
-  tags:
-    - ${GITLAB_RUNNER_TAG}

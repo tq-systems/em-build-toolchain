@@ -3,6 +3,7 @@
   extends:
     - .artifacts-always-one-day
     - .image-aarch64
+    - .gitlab-runner-tag
   script:
     - make deps
   rules:
@@ -15,6 +16,7 @@
   extends:
     - .artifacts-always-one-week
     - .image-aarch64
+    - .gitlab-runner-tag
   before_script:
     - make deps-extract
   script:

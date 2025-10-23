@@ -21,7 +21,6 @@ include:
     - when: always
 
 - local: 'ci/common/artifacts.yml'
-- local: 'ci/common/default.yml'
 - local: 'ci/common/deploy.yml'
 - local: 'ci/common/images.yml'
 - local: 'ci/common/variables.yml'

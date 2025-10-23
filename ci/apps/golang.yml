@@ -1,5 +1,7 @@
 .go-lint:
   stage: test
+  extends:
+    - .gitlab-runner-tag
   script:
     - make go-lint
   rules:
@@ -9,6 +11,8 @@
 
 .go-sec:
   stage: test
+  extends:
+    - .gitlab-runner-tag
   script:
     - make go-sec
   rules:
