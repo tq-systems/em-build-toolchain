@@ -9,20 +9,45 @@ stages:
   - common
   - amd64
   - otherimages
+  - trigger-app
+  - trigger-bundle
 
 .docker-build:
   extends:
     - .image-docker
     - .before-script-docker-login
 
-shell linter:
+.rule-release-images:
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      variables:
+        BUILD_TAG: 'latest'
+    - if: $CI_COMMIT_TAG != null
+      variables:
+        BUILD_TAG: $CI_COMMIT_TAG
+    - if: >
+        $CI_PIPELINE_SOURCE == "merge_request_event"
+        && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH
+      variables:
+        BUILD_TAG: 'next-main'
+
+.rule-trigger-tests:
+  rules:
+    - if: >
+        $CI_PIPELINE_SOURCE == "merge_request_event"
+        && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH
+      variables:
+        PUBLIC_TOOLCHAIN_DOCKER_TAG: 'next-main'
+        TOOLCHAIN_REF: $CI_COMMIT_REF_NAME
+
+Shell Linter:
   extends:
     - .lint-shell
     - .rule-include-development-branches
   script:
     - lint.sh shell -d scripts
 
-test all builds:
+Test All Builds:
   extends:
     - .docker-build
     - .rule-include-development-branches
@@ -35,30 +60,30 @@ test all builds:
       make test-release BUILD_TAG=${BUILD_TAG}
     fi
 
-gitleaks:
+Gitleaks:
   extends: .gitleaks
 
 # Build and push docker images
-common image:
+common Image:
   extends:
     - .docker-build
-    - .rule-include-default-branch-or-tags
+    - .rule-release-images
   stage: common
   script:
     - make release IMAGE=common
 
-amd64 image:
+amd64 Image:
   extends:
     - .docker-build
-    - .rule-include-default-branch-or-tags
+    - .rule-release-images
   stage: amd64
   script:
     - make release IMAGE=amd64
 
-other images:
+Other Images:
   extends:
     - .docker-build
-    - .rule-include-default-branch-or-tags
+    - .rule-release-images
   stage: otherimages
   parallel:
     matrix:
@@ -67,3 +92,26 @@ other images:
           - aarch64
   script:
     - make release IMAGE=${STACK}
+
+# Trigger tests in downstream projects
+Trigger App Build:
+  stage: trigger-app
+  extends:
+    - .rule-trigger-tests
+  variables:
+    GO_DEMO_APP_BRANCH: 'main'
+  trigger:
+    project: tq-em/public/apps/go-demo
+    branch: ${GO_DEMO_APP_BRANCH}
+    strategy: depend
+
+Trigger Bundle Build:
+  stage: trigger-bundle
+  extends:
+    - .rule-trigger-tests
+  variables:
+    DEMO_BUNDLE_BRANCH: 'main'
+  trigger:
+    project: tq-em/public/bundles/demo
+    branch: ${DEMO_BUNDLE_BRANCH}
+    strategy: depend
