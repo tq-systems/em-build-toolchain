@@ -1,9 +1,17 @@
 #!/bin/sh
 
+SCRIPT_NAME="$(basename "$0")"
 usage() {
-	echo >&2 'Usage: em-app-uninstall <ip> <app-id> <opt:root password>'
-	echo >&2
-	echo >&2 'Uninstall Energy Manager app package from app file system.'
+	echo "$SCRIPT_NAME
+
+NAME
+       $SCRIPT_NAME - uninstall an application via SSH
+
+SYNOPSIS
+       $SCRIPT_NAME IP_ADDRESS APP_ID [PASSWORD]
+
+DESCRIPTION
+       Uninstall Energy Manager app package from app file system."
 }
 
 if [ "$1" = '--help' ] || [ "$1" = '-h' ]; then
@@ -35,7 +43,7 @@ $SSHPASS ssh \
 	PATH=/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin
 
 	empkg uninstall \"$APP_ID\"
-	
+
 	if [ -e \"/apps/installed/$APP_ID\" ]; then
 		empkg enable \"$APP_ID\"
 	fi
