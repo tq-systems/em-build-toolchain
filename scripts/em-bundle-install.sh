@@ -4,18 +4,21 @@
 
 set -e
 
+SCRIPT_NAME="$(basename "$0")"
 usage() {
-	echo "NAME
-       em-bundle-install - install an bundle via SSH
+	echo "$SCRIPT_NAME
+
+NAME
+       $SCRIPT_NAME - install a bundle via SSH
 
 SYNOPSIS
-       em-bundle-install IPADDRESS BUNDLE [OPTIONS]
+       $SCRIPT_NAME IP_ADDRESS BUNDLE [OPTIONS]
 
 OPTIONS
        -f, --factory-reset
               run a factory reset during the update process,
               this option is highly recommended for downgrades
-       -p, --password <password>
+       -p, --password PASSWORD
               provide the root password for non-interactive execution
 
 DESCRIPTION

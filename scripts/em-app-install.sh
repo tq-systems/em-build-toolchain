@@ -1,9 +1,17 @@
 #!/bin/sh
 
+SCRIPT_NAME="$(basename "$0")"
 usage() {
-	echo >&2 'Usage: em-app-install <ip> <empkg> <opt:root password>'
-	echo >&2
-	echo >&2 'Install any valid Energy Manager app package (*.empkg) into app file system.'
+	echo "$SCRIPT_NAME
+
+NAME
+       $SCRIPT_NAME - install an application via SSH
+
+SYNOPSIS
+       $SCRIPT_NAME IP_ADDRESS APP_FILE [PASSWORD]
+
+DESCRIPTION
+       Install an Energy Manager application (*.empkg) to the app file system."
 }
 
 if [ "$1" = '--help' ] || [ "$1" = '-h' ]; then
