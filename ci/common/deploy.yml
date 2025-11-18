@@ -26,3 +26,23 @@
   # For now the tags need to be set hard-coded to prevent issues with variables and trigger events
   tags:
     - tqem-deploy
+
+.deploy-snapshot:
+  stage: deploy
+  cache:
+    policy: pull
+  extends:
+    - .image-amd64
+    - .gitlab-runner-tag
+  variables:
+    MAKE_TARGET: deploy-snapshot
+  script:
+    - make ${MAKE_TARGET}
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: never
+    # Deploy snapshots for the default branch only
+    - if: $CI_COMMIT_TAG == null || $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  # For now the tags need to be set hard-coded to prevent issues with variables and trigger events
+  tags:
+    - tqem-deploy-snapshots
