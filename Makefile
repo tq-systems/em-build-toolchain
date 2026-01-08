@@ -1,45 +1,36 @@
 include $(CURDIR)/environment.mk
 
-all: prepare
-	$(MAKE) ${IMAGE}
+IMAGE ?= common amd64 aarch64
 
-prepare-env:
+all: prepare-files
+	$(MAKE) $(IMAGE)
+
+prepare:
 	./prepare.sh env ${EM_BUILD_REF}
 
-prepare-tmp:
+prepare-files: prepare
 	mkdir -p ${TQEM_TMP_PATH}
 	./prepare.sh files ${EM_BUILD_REF}
 
-prepare:
-	$(MAKE) prepare-env
-	$(MAKE) prepare-tmp
-	cat ${DOCKER_COMPOSE_BASE_ENV} ${DOCKER_COMPOSE_FILES_ENV} > ${DOCKER_COMPOSE_ENV}
-
 common: prepare
-	${DOCKER_COMPOSE} common
+	${DOCKER_COMPOSE_BUILD} common
 
 amd64: common
-	${DOCKER_COMPOSE} amd64
+	${DOCKER_COMPOSE_BUILD} amd64
 
-aarch64: common amd64
-	${DOCKER_COMPOSE} aarch64
+aarch64: prepare-files amd64
+	${DOCKER_COMPOSE_BUILD} aarch64
 
-push: prepare-env
+push: prepare
 ifeq (${PUBLIC_TOOLCHAIN_REGISTRY}, ${LOCAL_TOOLCHAIN})
 	$(error Prevent pushing to non-existing docker.io/${LOCAL_TOOLCHAIN}, exit.)
 endif
 	docker compose ${COMPOSE_FILE} push ${IMAGE}
 
-pull: prepare-env
+pull: prepare
 	docker compose ${COMPOSE_FILE} pull ${IMAGE}
 
-clean-base-env:
-	rm -f ${DOCKER_COMPOSE_BASE_ENV}
-
-clean-files-env:
-	rm -f ${DOCKER_COMPOSE_FILES_ENV}
-
-clean-env: clean-base-env clean-files-env
+clean-env:
 	rm -f ${DOCKER_COMPOSE_ENV}
 
 clean-tmp:
@@ -61,7 +52,7 @@ ifneq (,$(shell echo "${BUILD_TAG}" | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+'))
 endif
 
 # Explicitly skip 'clean-tmp' target to enable exchanging files in tmp directory
-test-release: check-tag clean-base-env
+test-release: check-tag clean-env
 	$(MAKE) all
 	$(MAKE) push clean-system
 
@@ -70,8 +61,8 @@ release: clean-env clean-tmp
 	$(MAKE) all
 	$(MAKE) push clean-system
 
-.PHONY: all $(IMAGE) \
-	prepare-env prepare-tmp prepare \
+.PHONY: all common amd64 aarch64 \
+	prepare prepare-files \
 	push pull \
-	clean-base-env clean-files-env clean-env clean-tmp clean-system clean \
+	clean-env clean-tmp clean-system clean \
 	check-tag test-release release
