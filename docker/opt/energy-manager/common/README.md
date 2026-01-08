@@ -7,6 +7,7 @@ The following common applications exist:
 | File           | Description                              |
 |----------------|------------------------------------------|
 | artifacts.mk   | Handling of artifacts directories        |
+| deploy.mk      | Deployment of artifacts                  |
 | environment.mk | Environment variables (e.g. directories) |
 | version.mk     | Versioning of project artifacts          |
 
