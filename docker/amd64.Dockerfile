@@ -29,51 +29,40 @@ RUN apt-get update && apt-get -y upgrade \
 	python3-absl \
 && apt-get autoremove --yes && apt-get clean --yes
 
+# Install cross-compiler toolchain to get access to the native EMOS tools
 ENV OE_ARCH=aarch64-oe-linux
-# Install cross-compiler toolchain
 ARG PATH_AARCH64_TOOLCHAIN TMP_TOOLCHAIN=/tmp/toolchain.sh
 COPY ${PATH_AARCH64_TOOLCHAIN} ${TMP_TOOLCHAIN}
 RUN chmod +x ${TMP_TOOLCHAIN} && ${TMP_TOOLCHAIN} -d /opt/emos -y && rm ${TMP_TOOLCHAIN}
 
-ENV GO_VERSION=1.23.6
-
-# Fetch the latest Go version
-RUN GO_VERSION=$(curl -s https://go.dev/VERSION?m=text | awk '/^go/{print $0}' | sed 's/^go//'); \
-	if [ -z "$GO_VERSION" ]; then echo "Go version not found"; exit 1; fi && \
-	echo "Using Go version: ${GO_VERSION}" && \
-	wget -c -nv --no-check-certificate https://go.dev./dl/go${GO_VERSION}.linux-amd64.tar.gz -O - | tar -xz -C /usr/local
-ENV PATH=/usr/local/go/bin:$PATH
+ARG GO_VERSION=1.25.5
+RUN wget -c -nv --no-check-certificate https://go.dev./dl/go${GO_VERSION}.linux-amd64.tar.gz -O - \
+	| tar -xz -C /usr/local
 
 RUN pip3 install cpplint gcovr lizard pytest pymodbus
 
-ARG DOCKER_USER
-ENV DOCKER_USER=${DOCKER_USER}
 # TODO: workaround: git clone as user and install as root - we need to install only fixed versions
+ARG DOCKER_USER
 USER ${DOCKER_USER}
-# 
-RUN git clone https://github.com/tq-systems/libdeviceinfo-em.git libdeviceinfo && cd libdeviceinfo && git checkout v1.6.0 \
+ARG LIBDEVICEINFO_VERSION=1.8.0
+RUN git clone https://github.com/tq-systems/libdeviceinfo-em.git libdeviceinfo \
+	&& cd libdeviceinfo && git checkout v${LIBDEVICEINFO_VERSION} \
 	&& mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr .. && make
 USER root
 RUN make -C libdeviceinfo/build install && rm -r libdeviceinfo
 
 USER ${DOCKER_USER}
 
-ENV GOPATH=/workspace/go
-ENV PATH=$GOPATH/bin:/workspace/.yarn/node_modules/.bin:$PATH:/home/${DOCKER_USER}/.local/bin
-ENV GO111MODULE=on
-ARG GOPRIVATE
-ENV GOPRIVATE=${GOPRIVATE}
-
-ENV PROTOC_VERSION=25.3
-
-ENV PB_REL="https://github.com/protocolbuffers/protobuf/releases"
-RUN curl -LO $PB_REL/download/v${PROTOC_VERSION}/protoc-${PROTOC_VERSION}-linux-x86_64.zip; \
-	unzip protoc-${PROTOC_VERSION}-linux-x86_64.zip -d /home/${DOCKER_USER}/.local
-
-RUN git clone https://github.com/protocolbuffers/protobuf.git; \
-	cd protobuf && git checkout v${PROTOC_VERSION} && git submodule update --init --recursive && mkdir cmake/build && \
-	cd cmake/build && cmake -Dprotobuf_WITH_ABSEIL=ON -Dprotobuf_BUILD_SHARED_LIBS=ON -Dprotobuf_BUILD_TESTS=OFF -DCMAKE_BUILD_TYPE=Release ../.. && sudo make -j$(nproc) && sudo make install && \
-	rm -rf /workspace/protobuf && rm -f /workspace/protoc-${PROTOC_VERSION}-linux-x86_64.zip && sudo ldconfig
+ARG PB_VERSION=25.3
+ARG PB_URL="https://github.com/protocolbuffers/protobuf"
+ARG PB_FILE="protoc-${PB_VERSION}-linux-x86_64.zip"
+RUN curl -LO ${PB_URL}/releases/download/v${PB_VERSION}/${PB_FILE} \
+	&& unzip ${PB_FILE} -d /home/${DOCKER_USER}/.local && rm -f ${PB_FILE}
+RUN git clone ${PB_URL}.git && cd protobuf && git checkout v${PB_VERSION} \
+	&& git submodule update --init --recursive && mkdir cmake/build && cd cmake/build \
+	&& cmake -Dprotobuf_WITH_ABSEIL=ON -Dprotobuf_BUILD_SHARED_LIBS=ON -Dprotobuf_BUILD_TESTS=OFF \
+		-DCMAKE_BUILD_TYPE=Release ../.. \
+	&& sudo make -j$(nproc) && sudo make install && rm -rf /workspace/protobuf && sudo ldconfig
 
 RUN go install go.uber.org/mock/mockgen@v0.4.0
 RUN go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.64.5
@@ -85,7 +74,10 @@ RUN go install github.com/zricethezav/gitleaks/v8@v8.15.1
 RUN go install github.com/planetscale/vtprotobuf/cmd/protoc-gen-go-vtproto@v0.6.0
 RUN go install github.com/tq-systems/public-go-utils/cmd/omitemptyremover@v1.0.0
 RUN go install github.com/tq-systems/em-go-licenses@v1.0.1-tq
+RUN go install github.com/CycloneDX/cyclonedx-gomod/cmd/cyclonedx-gomod@v1.9.0
 
+# Files that change rapidly are processed last to improve build performance
+USER root
 COPY ./docker/opt/ /opt/
 
 USER ${DOCKER_USER}
