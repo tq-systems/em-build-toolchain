@@ -7,3 +7,4 @@
 - Update Go to 1.25.5
 - Update libdeviceinfo to 1.8.0
 - Remove irrelevant variant handling of applications
+- backend-go-mod.mk: ignore mocks for code coverage calculation

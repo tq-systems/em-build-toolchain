@@ -32,11 +32,15 @@ go-sec: go-deps
 
 go-test:
 	cd ${DIR_BACKEND} && go test -race -mod=vendor -v -cover \
-		-coverprofile ${DIR_BACKEND_BUILD}/cover.out ./...
+		-coverpkg=./... -coverprofile ${DIR_BACKEND_BUILD}/cover.out ./...
+	cd ${DIR_BACKEND} && grep -v '/mocks'/ ${DIR_BACKEND_BUILD}/cover.out > ${DIR_BACKEND_BUILD}/cover.out.filtered && \
+		mv ${DIR_BACKEND_BUILD}/cover.out.filtered ${DIR_BACKEND_BUILD}/cover.out
 
 go-test-junit: go-deps # Run unit test with junit report
-	cd ${DIR_BACKEND} && go test -race -mod=vendor -v -coverprofile coverprofile ./... 2>&1 \
+	cd ${DIR_BACKEND} && go test -race -mod=vendor -v -coverpkg=./... -coverprofile coverprofile ./... 2>&1 \
 		| go-junit-report -set-exit-code > ${TQEM_PROJECT_ROOT_PATH}/report.xml
+	cd ${DIR_BACKEND} && grep -v '/mocks'/ coverprofile > coverprofile.filtered && \
+		mv coverprofile.filtered coverprofile
 	cd ${DIR_BACKEND} && go tool cover -func=coverprofile | grep total | awk '{ print $$1 " " $$3}'
 
 go-coverage: go-test
