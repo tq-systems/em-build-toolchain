@@ -32,37 +32,41 @@ RUN apt-get update && apt-get -y upgrade && apt-get install -y \
 	wget \
 	unzip
 
+# Install a fixed node version
+ARG NODE_VERSION=22.13.0
+RUN apt-get install -y nodejs=${NODE_VERSION}-1nodesource1 && apt-mark hold nodejs
+
+# prepare working directory
+ARG DOCKER_USER
+ENV DOCKER_USER=${DOCKER_USER}
+RUN mkdir /workspace && chown -R ${DOCKER_USER}:${DOCKER_USER} /workspace
+WORKDIR /workspace
+
+# Install a fixed yarn version
+ARG YARN_VERSION=4.6.0
+ENV COREPACK_HOME=/workspace/.corepack
+ENV PATH=$COREPACK_HOME:$PATH
+RUN corepack enable && corepack prepare yarn@${YARN_VERSION} --activate
+# Some commands need write permissions for the corepack directories
+RUN chown -R ${DOCKER_USER}:${DOCKER_USER} ${COREPACK_HOME}
+
 # Set locales
 ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
 ENV LANGUAGE=C.UTF-8
 
+# Prepare golang environment for further images
+ENV GOPATH=/workspace/go
+ENV PATH=/usr/local/go/bin:$PATH:$GOPATH/bin
+ENV GO111MODULE=on
+ARG GOPRIVATE
+ENV GOPRIVATE=${GOPRIVATE}
+
+# Enable access to local binaries
+ENV PATH=$PATH:/home/${DOCKER_USER}/.local/bin
+
 # We need to add 'tqemci' user for sudoers to enable it for the 'docker' user
 RUN printf "tqemci ALL=(ALL) NOPASSWD:ALL\n" >> /etc/sudoers
 
-# prepare working directory
-ARG DOCKER_USER
-ENV DOCKER_USER=${DOCKER_USER}
-RUN mkdir /workspace && chown -R ${DOCKER_USER} /workspace
-WORKDIR /workspace
-
-# Install nvm
-ENV NVM_DIR=/root/.nvm
-RUN mkdir -p $NVM_DIR \
-	&& curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
-
-ENV NODE_VERSION=22.13.0
-ENV YARN_VERSION=4.6.0
-
-RUN bash -c 'export NVM_DIR="${NVM_DIR:-$HOME/.nvm}" \
-	&& source "$NVM_DIR/nvm.sh" \
-	&& nvm install "$NODE_VERSION" \
-	&& nvm alias default "$NODE_VERSION" \
-	&& nvm use "$NODE_VERSION" \
-	&& export NODE_EXTRA_CA_CERTS=/etc/ssl/certs/ca-certificates.crt \
-	&& corepack enable \
-	&& corepack prepare yarn@$YARN_VERSION --activate'
-
-# Link binaries for system-wide access
-RUN ln -s $NVM_DIR/versions/node/v22.13.0/bin/node /usr/local/bin/node \
-	&& ln -s $NVM_DIR/versions/node/v22.13.0/bin/yarn /usr/local/bin/yarn
+# Enable to use the scripts in further images
+COPY ./scripts/*.sh /usr/local/bin/

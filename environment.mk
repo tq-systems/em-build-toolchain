@@ -1,10 +1,9 @@
-IMAGE ?= common amd64 aarch64
-
 COMPOSE_FILE ?= -f docker-compose.yml
 # Additional docker-compose build options may be set (e.g. --no-cache)
 BUILD_ARGS ?=
 
-DOCKER_COMPOSE := docker compose $(COMPOSE_FILE) build $(BUILD_ARGS)
+DOCKER_COMPOSE := docker compose $(COMPOSE_FILE)
+DOCKER_COMPOSE_BUILD := $(DOCKER_COMPOSE) build $(BUILD_ARGS)
 
 # The if-clause also applies if an empty string is set in CI pipelines
 ifeq ($(strip ${BUILD_TAG}),)
@@ -13,8 +12,6 @@ endif
 
 # .env file is read by docker-compose
 export DOCKER_COMPOSE_ENV = .env
-export DOCKER_COMPOSE_BASE_ENV = .base_env
-export DOCKER_COMPOSE_FILES_ENV = .files_env
 export TQEM_TMP_PATH = tmp
 
 # Default strings, if no docker registry images are defined
@@ -26,7 +23,6 @@ BASE_DOCKER_TAG ?= latest
 PUBLIC_TOOLCHAIN_REGISTRY ?= ${LOCAL_TOOLCHAIN}
 TQEM_APPS_CACHE ?= ""
 
-BUILD_RELEASE ?= false
 EM_BUILD_REF ?= master
 
 DOCKER_USER ?= tqemci

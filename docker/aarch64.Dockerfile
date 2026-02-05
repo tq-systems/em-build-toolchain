@@ -6,9 +6,6 @@ ARG BUILD_TAG
 FROM ${PUBLIC_TOOLCHAIN_REGISTRY}/amd64:${BUILD_TAG} AS tools
 FROM ${PUBLIC_TOOLCHAIN_REGISTRY}/common:${BUILD_TAG}
 
-COPY --from=tools /usr/local/go /usr/local/go
-ENV PATH=/usr/local/go/bin:$PATH
-
 ENV PKG_ARCH=aarch64
 ENV OE_ARCH=aarch64-oe-linux
 
@@ -20,6 +17,8 @@ RUN chmod +x ${TMP_TOOLCHAIN} && ${TMP_TOOLCHAIN} -d /opt/emos -y && rm ${TMP_TO
 COPY ./docker/make-toolchain-wrappers.sh /tmp/make-toolchain-wrappers.sh
 RUN . /opt/emos/environment-setup-$OE_ARCH && /tmp/make-toolchain-wrappers.sh \
 	&& rm /tmp/make-toolchain-wrappers.sh
+
+COPY --from=tools /usr/local/go /usr/local/go
 
 RUN . /opt/emos/environment-setup-$OE_ARCH && \
 	( \
@@ -42,21 +41,15 @@ RUN tar -C ${PATH_EMIT_EM_AARCH64} -xf ${TMP_EM_AARCH64_BOOTLOADER} && rm ${TMP_
 ARG PATH_EM_AARCH64_CORE_IMAGE
 COPY ${PATH_EM_AARCH64_CORE_IMAGE} ${PATH_EMIT_EM_AARCH64}/em-image-core-em-aarch64.tar
 
-# Install amd64 go binaries
-COPY --from=tools /workspace/go/bin /workspace/go/bin
-
 ARG DOCKER_USER
-RUN chown -R ${DOCKER_USER} /workspace
+USER ${DOCKER_USER}
+RUN mkdir -p $GOPATH/bin
+COPY --from=tools $GOPATH/bin $GOPATH/bin
 
+# Files that change rapidly are processed last to improve build performance
+USER root
 COPY ./docker/opt/ /opt/
 
 USER ${DOCKER_USER}
-
-ENV GOPATH=/workspace/go
-ENV PATH=$PATH:$GOPATH/bin
-
-ENV GO111MODULE=on
-ARG GOPRIVATE
-ENV GOPRIVATE=${GOPRIVATE}
 
 ENTRYPOINT ["sh", "-c", ". /opt/emos/environment-setup-$OE_ARCH && exec \"$@\"", "-"]

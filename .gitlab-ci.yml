@@ -1,8 +1,29 @@
-
 include:
 - project: tq-em/public/build/base
   file: ci/include.yml
+  ref: v2.0.3
+  rules:
+    - if: '$BASE_CI_REF'
+      when: never
+    - if: '$CI_COMMIT_TAG'
+    - if: '$CI_COMMIT_BRANCH =~ /^release/ || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^release/'
+
+- project: tq-em/public/build/base
+  file: ci/include.yml
   ref: main
+  rules:
+    - if: '$BASE_CI_REF || $CI_COMMIT_TAG'
+      when: never
+    - if: '$CI_COMMIT_BRANCH =~ /^release/ || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^release/'
+      when: never
+    - when: always
+
+- project: tq-em/public/build/base
+  file: ci/include.yml
+  ref: $BASE_CI_REF
+  rules:
+    - if: '$BASE_CI_REF'
+
 
 stages:
   - test
@@ -17,6 +38,38 @@ stages:
     - .image-docker
     - .before-script-docker-login
 
+Shell Linter:
+  extends:
+    - .lint-shell
+    - .rule-include-development-branches
+
+Test All Builds:
+  extends:
+    - .docker-build
+  stage: test
+  variables:
+    BUILD_TAG: 'test-next'
+  script: |
+    make all
+    if [ "$DEPLOY_TEST_IMAGES" = "true" ]; then
+      make push
+    fi
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH || $CI_COMMIT_TAG
+      when: never
+    - if: >
+        $CI_PIPELINE_SOURCE == "merge_request_event"
+        && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH
+      variables:
+        DEPLOY_TEST_IMAGES: 'true'
+    - if: $TRIGGER_TESTS == 'true'
+      variables:
+        DEPLOY_TEST_IMAGES: 'true'
+
+Gitleaks:
+  extends: .gitleaks
+
+# Build and push docker images
 .rule-release-images:
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
@@ -25,45 +78,7 @@ stages:
     - if: $CI_COMMIT_TAG != null
       variables:
         BUILD_TAG: $CI_COMMIT_TAG
-    - if: >
-        $CI_PIPELINE_SOURCE == "merge_request_event"
-        && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH
-      variables:
-        BUILD_TAG: 'next-main'
 
-.rule-trigger-tests:
-  rules:
-    - if: >
-        $CI_PIPELINE_SOURCE == "merge_request_event"
-        && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH
-      variables:
-        PUBLIC_TOOLCHAIN_DOCKER_TAG: 'next-main'
-        TOOLCHAIN_REF: $CI_COMMIT_REF_NAME
-
-Shell Linter:
-  extends:
-    - .lint-shell
-    - .rule-include-development-branches
-  script:
-    - lint.sh shell
-
-Test All Builds:
-  extends:
-    - .docker-build
-    - .rule-include-development-branches
-  stage: test
-  variables:
-    BUILD_TAG: test-next
-  script: |
-    make all
-    if [ "$DEPLOY_TEST_IMAGES" = "true" ]; then
-      make test-release BUILD_TAG=${BUILD_TAG}
-    fi
-
-Gitleaks:
-  extends: .gitleaks
-
-# Build and push docker images
 common Image:
   extends:
     - .docker-build
@@ -94,10 +109,34 @@ Other Images:
     - make release IMAGE=${STACK}
 
 # Trigger tests in downstream projects
+.trigger-tests:
+  variables:
+    BASE_DOCKER_TAG: 'latest'
+    BASE_CI_REF: 'main'
+    PUBLIC_TOOLCHAIN_CI_REF: $CI_COMMIT_REF_NAME
+  rules:
+    - if: >
+        $CI_PIPELINE_SOURCE == "merge_request_event"
+        && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH
+      variables:
+        PUBLIC_TOOLCHAIN_DOCKER_TAG: 'test-next'
+    - if: $TRIGGER_TESTS == 'true' && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      variables:
+        PUBLIC_TOOLCHAIN_DOCKER_TAG: 'latest'
+    - if: $TRIGGER_TESTS == 'true' && $CI_COMMIT_TAG
+      variables:
+        PUBLIC_TOOLCHAIN_DOCKER_TAG: $CI_COMMIT_TAG
+    - if: $TRIGGER_TESTS == 'true' && $BUILD_TAG == null
+      variables:
+        PUBLIC_TOOLCHAIN_DOCKER_TAG: 'test-next'
+    - if: $TRIGGER_TESTS == 'true' && $BUILD_TAG
+      variables:
+        PUBLIC_TOOLCHAIN_DOCKER_TAG: $BUILD_TAG
+
+
 Trigger App Build:
   stage: trigger-app
-  extends:
-    - .rule-trigger-tests
+  extends: .trigger-tests
   variables:
     GO_DEMO_APP_BRANCH: 'main'
   trigger:
@@ -107,8 +146,7 @@ Trigger App Build:
 
 Trigger Bundle Build:
   stage: trigger-bundle
-  extends:
-    - .rule-trigger-tests
+  extends: .trigger-tests
   variables:
     DEMO_BUNDLE_BRANCH: 'main'
   trigger:

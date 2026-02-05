@@ -37,25 +37,6 @@ Upgrades the frontend/backend dependencies and the toolchain version.
 
     make upgrade-deps
 
-## Support for multiple node versions
-
-The supported node versions are installed when the docker images are built. They are defined in
-the `environment.mk` file in the root folder of this project. They are also stored in the image's
-environment variables `SUPPORTED_NODE_VERSIONS` and `NODE_DEFAULT_VERSION`. The node version is set
-when the docker container is started (docker ENTRYPOINT). It is not possible to set it when
-the container is running.
-
-The node version can be changed in an app from the standard version to another supported version
-by writing the desired version to the `.nvmrc` file in the root folder of the app.
-Semantic versions (e.g. 18.20.5) can be specified, but patch levels (e.g. 20.18)
-and minor versions (e.g. 22) can also be omitted. The toolchain sets a supported/installed version
-based on the desired version, provided that the major versions match and the supported version is
-equal to or newer than the desired version.
-
-## Yarn
-Please note that if Node >= 18 is used, Yarn version 4.6.0 is automatically used.
-For versions < 18, version 1.22.22 is used.
-
 # Files
 For each Makefile, under the description, there can be a table with variables that may be of interest.
 If necessary, these variables can be adjusted in the Makefile of the app project.
@@ -257,7 +238,7 @@ arbitrarily to allow modification of app and core image configs.
 
 In the internal-go-utils repository a firewall package is provided to dynamically open and close ports.
 If the application to use the firewall package is sandboxed the path `/run/em/etc/nftables.d/` must
-be added to MANIFEST_RW_PATHS (see above) 
+be added to MANIFEST_RW_PATHS (see above).
 
 ### Debugging
 In order to identify the necessary ports to open for an app, either study the app source

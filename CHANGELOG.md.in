@@ -1,1 +1,9 @@
 ## [{{ version }}]
+### Added
+- Option to use internal toolchain extensions
+- sbom feature for applications
+
+### Changed
+- Update Go to 1.25.5
+- Update libdeviceinfo to 1.8.0
+- Remove irrelevant variant handling of applications
