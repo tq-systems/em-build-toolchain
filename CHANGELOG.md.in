@@ -10,3 +10,4 @@
 
 ### Fixed
 - go-generate-code: fail if untracked files are present
+- backend-go-mod.mk: ignore mocks for code coverage calculation
