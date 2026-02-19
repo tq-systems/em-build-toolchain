@@ -29,11 +29,13 @@ RUN apt-get update && apt-get -y upgrade \
 	python3-absl \
 && apt-get autoremove --yes && apt-get clean --yes
 
-# Install cross-compiler toolchain to get access to the native EMOS tools
-ENV OE_ARCH=aarch64-oe-linux
-ARG PATH_AARCH64_TOOLCHAIN TMP_TOOLCHAIN=/tmp/toolchain.sh
-COPY ${PATH_AARCH64_TOOLCHAIN} ${TMP_TOOLCHAIN}
-RUN chmod +x ${TMP_TOOLCHAIN} && ${TMP_TOOLCHAIN} -d /opt/emos -y && rm ${TMP_TOOLCHAIN}
+# TODO: Remove this after moving to Ubuntu 24.04
+# Add Ubuntu 24.04 sources temporarily, update, install packages, and remove sources
+RUN echo 'deb http://archive.ubuntu.com/ubuntu noble main universe' > /etc/apt/sources.list.d/ubuntu-24.04.list \
+	&& apt-get update \
+	&& apt-get install -y libsoup-3.0-dev libglib2.0-dev libgupnp-1.6 libgupnp-1.6-dev \
+	&& rm -f /etc/apt/sources.list.d/ubuntu-24.04.list \
+	&& rm -rf /var/lib/apt/lists/*
 
 ARG GO_VERSION=1.25.5
 RUN wget -c -nv --no-check-certificate https://go.dev./dl/go${GO_VERSION}.linux-amd64.tar.gz -O - \
