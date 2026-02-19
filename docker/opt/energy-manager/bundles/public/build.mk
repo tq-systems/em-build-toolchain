@@ -8,7 +8,7 @@ EMIT_BASE_ARGS = --arch ${PKG_ARCH} --bundle-spec ${BASE_SPEC} ${EMIT_OPTIONS}
 
 RAUC_KEY      ?= /opt/energy-manager/emit/cert/key.devel.pem
 RAUC_CERT     ?= /opt/energy-manager/emit/cert/ca.devel.pem
-RAUC_KEYRING  ?= ${RAUC_KEY}
+RAUC_KEYRING  ?= ${RAUC_CERT}
 
 BUNDLE_BUILD_NAME ?= ${DEVEL_BUNDLE_NAME}
 
