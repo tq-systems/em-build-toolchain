@@ -2,6 +2,7 @@
 ### Added
 - Option to use internal toolchain extensions
 - sbom feature for applications
+- Add em-install-devel-cert.sh script
 
 ### Changed
 - Update Go to 1.25.5
@@ -11,3 +12,4 @@
 ### Fixed
 - go-generate-code: fail if untracked files are present
 - backend-go-mod.mk: ignore mocks for code coverage calculation
+- Critial rauc update issue with the keyring
