@@ -13,3 +13,4 @@
 - go-generate-code: fail if untracked files are present
 - backend-go-mod.mk: ignore mocks for code coverage calculation
 - Critial rauc update issue with the keyring
+- Copy docker/usr/local in common docker image
