@@ -70,3 +70,6 @@ RUN printf "tqemci ALL=(ALL) NOPASSWD:ALL\n" >> /etc/sudoers
 
 # Enable to use the scripts in further images
 COPY ./scripts/*.sh /usr/local/bin/
+
+# Enable to use the local usr dir in further images
+COPY ./docker/usr/local/ /usr/local/
