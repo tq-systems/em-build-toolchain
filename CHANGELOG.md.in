@@ -8,6 +8,7 @@
 - Update Go to 1.25.5
 - Update libdeviceinfo to 1.8.0
 - Remove irrelevant variant handling of applications
+- Apps are stored in the deploy folder instead of the artifacts folder
 
 ### Fixed
 - go-generate-code: fail if untracked files are present

@@ -178,8 +178,8 @@ empkg-pack:
 	$(eval DIR_PKG_ARCHIVE = ${DIR_PACKAGE}/${BUILD_VARIANT}/pkg_archive)
 
 	tar --numeric-owner --owner=0 --group=0 -cJf ${DIR_PKG_ARCHIVE}/data.tar.xz -C ${DIR_PACKAGE}/${BUILD_VARIANT}/pkg_root${DIR_APP_ROOT} .
-	tar --numeric-owner --owner=0 --group=0 -cf ${TQEM_ARTIFACTS_PATH}/${PKG_FILE} -C ${DIR_PKG_ARCHIVE} manifest.json data.tar.xz
-	sha256sum ${TQEM_ARTIFACTS_PATH}/${PKG_FILE} | awk '{ print $$1 }' > ${TQEM_ARTIFACTS_PATH}/${PKG_FILE}.sha256
+	tar --numeric-owner --owner=0 --group=0 -cf ${TQEM_DEPLOY_PATH}/${PKG_FILE} -C ${DIR_PKG_ARCHIVE} manifest.json data.tar.xz
+	sha256sum ${TQEM_DEPLOY_PATH}/${PKG_FILE} | awk '{ print $$1 }' > ${TQEM_DEPLOY_PATH}/${PKG_FILE}.sha256
 
 empkg-build: empkg-data
 	$(MAKE) empkg-pack
