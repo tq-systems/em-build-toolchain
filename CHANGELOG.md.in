@@ -3,6 +3,7 @@
 - Option to use internal toolchain extensions
 - sbom feature for applications
 - Add em-install-devel-cert.sh script
+- Add link to latest empkg
 
 ### Changed
 - Update Go to 1.25.5

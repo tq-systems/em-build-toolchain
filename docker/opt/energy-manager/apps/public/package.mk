@@ -173,12 +173,16 @@ endif
 
 empkg-data: empkg-service empkg-license empkg-firewall empkg-dbus-conf empkg-manifest
 
+LINK_VERSION ?= latest
+
 empkg-pack:
-	$(eval PKG_FILE  = ${APP_ID}${APP_ID_SUFFIX}_${VERSION}_${PKG_ARCH}.${APP_FILE_SUFFIX})
+	$(eval PKG_FILE = ${APP_ID}${APP_ID_SUFFIX}_${VERSION}_${PKG_ARCH}.${APP_FILE_SUFFIX})
+	$(eval PKG_LINK = ${APP_ID}${APP_ID_SUFFIX}_${LINK_VERSION}_${PKG_ARCH}.${APP_FILE_SUFFIX})
 	$(eval DIR_PKG_ARCHIVE = ${DIR_PACKAGE}/${BUILD_VARIANT}/pkg_archive)
 
 	tar --numeric-owner --owner=0 --group=0 -cJf ${DIR_PKG_ARCHIVE}/data.tar.xz -C ${DIR_PACKAGE}/${BUILD_VARIANT}/pkg_root${DIR_APP_ROOT} .
 	tar --numeric-owner --owner=0 --group=0 -cf ${TQEM_DEPLOY_PATH}/${PKG_FILE} -C ${DIR_PKG_ARCHIVE} manifest.json data.tar.xz
+	ln -sf ${PKG_FILE} ${TQEM_DEPLOY_PATH}/${PKG_LINK}
 	sha256sum ${TQEM_DEPLOY_PATH}/${PKG_FILE} | awk '{ print $$1 }' > ${TQEM_DEPLOY_PATH}/${PKG_FILE}.sha256
 
 empkg-build: empkg-data
