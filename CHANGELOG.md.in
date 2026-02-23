@@ -16,3 +16,4 @@
 - backend-go-mod.mk: ignore mocks for code coverage calculation
 - Critial rauc update issue with the keyring
 - Copy docker/usr/local in common docker image
+- TQEM_GIT_REFERENCE: use symbolic-ref for branch determination
