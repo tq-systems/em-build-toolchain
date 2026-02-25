@@ -42,13 +42,15 @@ ENV DOCKER_USER=${DOCKER_USER}
 RUN mkdir /workspace && chown -R ${DOCKER_USER}:${DOCKER_USER} /workspace
 WORKDIR /workspace
 
-# Install a fixed yarn version
+# Install a fixed yarn version directly, without corepack
 ARG YARN_VERSION=4.6.0
-ENV COREPACK_HOME=/workspace/.corepack
-ENV PATH=$COREPACK_HOME:$PATH
-RUN corepack enable && corepack prepare yarn@${YARN_VERSION} --activate
-# Some commands need write permissions for the corepack directories
-RUN chown -R ${DOCKER_USER}:${DOCKER_USER} ${COREPACK_HOME}
+ENV YARN_ENABLE_TELEMETRY=0
+RUN curl -fsSL https://repo.yarnpkg.com/${YARN_VERSION}/packages/yarnpkg-cli/bin/yarn.js \
+    -o /usr/local/lib/yarn.cjs && \
+    printf '#!/bin/sh\nexec node /usr/local/lib/yarn.cjs "$@"\n' \
+    > /usr/local/bin/yarn && \
+    chmod +x /usr/local/bin/yarn && \
+    npm uninstall -g corepack
 
 # Set locales
 ENV LC_ALL=C.UTF-8
