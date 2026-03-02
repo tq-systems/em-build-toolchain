@@ -47,12 +47,7 @@ yarn-clean:
 	rm -rf ${DIR_FRONTEND}/node_modules ${DIR_FRONTEND_BUILD} node_modules
 
 yarn-upgrade:
-	cd ${DIR_FRONTEND} && yarn upgrade
-	$(MAKE) yarn-outdated
-
-yarn-outdated:
-	@echo "Checking for outdated packages with 'yarn outdated'. This lists packages that can be updated."
-	cd ${DIR_FRONTEND} && yarn outdated || true
+	cd ${DIR_FRONTEND} && yarn -R up '**' && yarn dedupe
 
 frontend-prepare:      yarn-deps
 frontend-deps-fetch:   yarn-deps
@@ -63,4 +58,4 @@ frontend-clean:        yarn-clean
 frontend-upgrade:      yarn-upgrade
 
 .PHONY: yarn-deps yarn-deps-extract yarn-test-unit yarn-audit yarn-release \
-	yarn-push yarn-clean yarn-upgrade yarn-outdated \
+	yarn-push yarn-clean yarn-upgrade \
