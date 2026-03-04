@@ -11,6 +11,8 @@
 - Remove irrelevant variant handling of applications
 - Apps are stored in the deploy folder instead of the artifacts folder
 - Replace corepack-based yarn installation with direct binary download to ensure fixed yarn version regardless of project configuration
+- ci: Remove obsolete artifacts handling
+- Use 'main' as subfolder for 'master' deployments
 
 ### Fixed
 - go-generate-code: fail if untracked files are present
