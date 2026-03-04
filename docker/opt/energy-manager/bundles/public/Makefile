@@ -12,7 +12,7 @@ include /opt/energy-manager/bundles/public/build.mk
 
 # deployment
 TQEM_DEPLOY_SOURCE_PATH ?= ${TQEM_DEPLOY_PATH}
-TQEM_DEPLOY_DESTINATION_PATH ?= ${TQEM_BUNDLES_DEPLOY_PATH}/${BUNDLE_NAME}/${TQEM_GIT_REFERENCE}
+TQEM_DEPLOY_DESTINATION_PATH ?= ${TQEM_BUNDLES_DEPLOY_PATH}/${BUNDLE_NAME}/${TQEM_DEPLOYMENT_SUBDIR}
 include /opt/energy-manager/common/public/deploy.mk
 
 all: build
