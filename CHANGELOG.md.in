@@ -6,6 +6,7 @@
 - Add link to latest empkg
 
 ### Changed
+- Install python-gitlab in common base image
 - Update Go to 1.25.5
 - Update libdeviceinfo to 1.8.0
 - Remove irrelevant variant handling of applications
