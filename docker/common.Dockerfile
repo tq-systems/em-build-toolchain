@@ -70,6 +70,9 @@ ENV PATH=$PATH:/home/${DOCKER_USER}/.local/bin
 # We need to add 'tqemci' user for sudoers to enable it for the 'docker' user
 RUN printf "tqemci ALL=(ALL) NOPASSWD:ALL\n" >> /etc/sudoers
 
+RUN pip3 install \
+	python-gitlab
+
 # Enable to use the scripts in further images
 COPY ./scripts/*.sh /usr/local/bin/
 
