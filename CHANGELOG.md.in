@@ -22,6 +22,7 @@
 - Copy docker/usr/local in common docker image
 - TQEM_GIT_REFERENCE: use symbolic-ref for branch determination
 - frontend-yarn.mk: yarn-upgrade target
+- package.mk: Prevent self-referential symlink when PKG_FILE equals PKG_LINK
 
 ### Removed
 - frontend-yarn.mk: broken yarn-outdated target
