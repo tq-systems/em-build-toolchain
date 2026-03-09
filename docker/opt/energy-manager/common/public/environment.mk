@@ -25,3 +25,11 @@ export TQEM_GIT_REFERENCE ?= $(shell git describe --exact-match --tags HEAD 2>/d
 	|| git symbolic-ref --short HEAD 2>/dev/null || git rev-parse --short HEAD)
 export TQEM_PROJECT_URL   ?= $(shell git remote get-url origin)
 export TQEM_PROJECT_NAME  ?= $(shell basename "${TQEM_PROJECT_URL}" .git)
+
+export TQEM_DEPLOYMENT_SUBDIR ?= ${TQEM_GIT_REFERENCE}
+
+# The subfolder ‘master’ is overwritten with ‘main’ in order to have a consistent deployment folder
+# structure, regardless of which default branch is set in the respective repo.
+ifeq ($(TQEM_DEPLOYMENT_SUBDIR),master)
+  export TQEM_DEPLOYMENT_SUBDIR = main
+endif

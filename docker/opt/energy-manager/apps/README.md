@@ -47,7 +47,7 @@ by the toolchain and described below.
 
 | Key                   | Default value             | Description                          |
 |-----------------------|---------------------------|--------------------------------------|
-| APP_ID                | (derived from directory)  | Unique app ID                        |
+| APP_ID                | (derived from git url)    | Unique app ID                        |
 | VERSION               | (Set from 'git describe') | Version of app                       |
 | FRONTEND_BUILD        | yarn                      | Frontend build mechanism             |
 | BACKEND_BUILD         | go-mod                    | Backend build mechanism              |
