@@ -88,7 +88,7 @@ all-debug: backend-debug frontend
 
 archive:
 	tar czf ${TQEM_DEPLOY_PATH}/${BUILD_ARCHIVE} -C ${TQEM_PROJECT_ROOT_PATH} \
-		--exclude=artifacts --exclude=deploy --exclude=test --exclude=frontend/container \
+		--exclude=artifacts --exclude=deploy --exclude=frontend/container \
 		--exclude=cache --exclude-caches-all --exclude-vcs .
 
 deps: prepare
