@@ -62,6 +62,7 @@ Test All Builds:
         && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH
       variables:
         DEPLOY_TEST_IMAGES: 'true'
+        BUILD_TAG: 'mr-${CI_MERGE_REQUEST_IID}'
     - if: $TRIGGER_TESTS == 'true'
       variables:
         DEPLOY_TEST_IMAGES: 'true'
@@ -119,7 +120,7 @@ Other Images:
         $CI_PIPELINE_SOURCE == "merge_request_event"
         && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH
       variables:
-        PUBLIC_TOOLCHAIN_DOCKER_TAG: 'test-next'
+        PUBLIC_TOOLCHAIN_DOCKER_TAG: 'mr-${CI_MERGE_REQUEST_IID}'
     - if: $TRIGGER_TESTS == 'true' && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       variables:
         PUBLIC_TOOLCHAIN_DOCKER_TAG: 'latest'
