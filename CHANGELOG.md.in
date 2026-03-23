@@ -6,6 +6,7 @@
 - Add link to latest empkg
 
 ### Changed
+- ci: MR pipelines use isolated Docker image tag mr-${CI_MERGE_REQUEST_IID} to prevent cross-MR image overwrites
 - Install python-gitlab in common base image
 - Update Go to 1.25.5
 - Update libdeviceinfo to 1.8.0
@@ -16,6 +17,7 @@
 - Use 'main' as subfolder for 'master' deployments
 
 ### Fixed
+- apps/public/Makefile: include frontend/test/ in snapshot archives by removing --exclude=test from archive target
 - go-generate-code: fail if untracked files are present
 - backend-go-mod.mk: ignore mocks for code coverage calculation
 - Critial rauc update issue with the keyring
