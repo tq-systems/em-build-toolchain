@@ -4,10 +4,6 @@
     - .gitlab-runner-tag
   script:
     - make go-lint
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      when: never
-    - when: on_success
 
 .go-sec:
   stage: test
@@ -15,7 +11,3 @@
     - .gitlab-runner-tag
   script:
     - make go-sec
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      when: never
-    - when: on_success
