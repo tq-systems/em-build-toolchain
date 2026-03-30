@@ -35,7 +35,12 @@ ARG GO_VERSION=1.25.5
 RUN wget -c -nv --no-check-certificate https://go.dev./dl/go${GO_VERSION}.linux-amd64.tar.gz -O - \
 	| tar -xz -C /usr/local
 
-RUN pip3 install cpplint gcovr lizard pytest pymodbus
+RUN pip install \
+	cpplint==2.0.2 \
+	gcovr==8.6 \
+	lizard==1.21.0 \
+	pytest==9.0.2 \
+	pymodbus==3.12.1
 
 # TODO: workaround: git clone as user and install as root - we need to install only fixed versions
 ARG DOCKER_USER

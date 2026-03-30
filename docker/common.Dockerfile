@@ -64,14 +64,14 @@ ENV GO111MODULE=on
 ARG GOPRIVATE
 ENV GOPRIVATE=${GOPRIVATE}
 
-# Enable access to local binaries
-ENV PATH=$PATH:/home/${DOCKER_USER}/.local/bin
+# Enable access to local binaries and venv
+ENV PATH=/opt/venv/bin:/home/${DOCKER_USER}/.local/bin:$PATH
 
 # We need to add 'tqemci' user for sudoers to enable it for the 'docker' user
 RUN printf "tqemci ALL=(ALL) NOPASSWD:ALL\n" >> /etc/sudoers
 
-RUN pip3 install \
-	python-gitlab
+RUN python3 -m venv /opt/venv \
+	&& pip install python-gitlab==8.2.0
 
 # Enable to use the scripts in further images
 COPY ./scripts/*.sh /usr/local/bin/
