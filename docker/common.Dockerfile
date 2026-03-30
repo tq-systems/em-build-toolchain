@@ -25,6 +25,7 @@ RUN apt-get update && apt-get -y upgrade && apt-get install -y \
 	nano \
 	python3 \
 	python3-pip \
+	python3-venv \
 	python3-yaml \
 	rsync \
 	software-properties-common \

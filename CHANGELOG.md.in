@@ -19,6 +19,7 @@
 - amd64.Dockerfile: replace libcurl3-dev with libcurl4-openssl-dev for Ubuntu 24 compatibility
 - amd64.Dockerfile: add libsoup-3.0-dev and libgupnp-1.6-dev to regular package install, remove Ubuntu 24 workaround
 - docker: install Python tools in venv with pinned versions for Ubuntu 24.04
+- common.Dockerfile: install python3-venv for venv support
 
 ### Fixed
 - apps/public/Makefile: include frontend/test/ in snapshot archives by removing --exclude=test from archive target
