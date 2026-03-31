@@ -1,0 +1,38 @@
+.build-package:
+  stage: build
+  extends:
+    - .image-amd64
+    - .gitlab-runner-tag
+  artifacts:
+    paths:
+      - dist
+      - lib
+      - build
+    expire_in: 1 week
+  script:
+    - make all
+
+.check-version:
+  stage: test
+  extends:
+    - .image-amd64
+    - .gitlab-runner-tag
+    - .prevent-loading-artifacts-and-cache
+  script:
+    - make version-check
+  rules:
+    - if: '$CI_COMMIT_TAG'
+      variables:
+        TQEM_GIT_TAG: ${CI_COMMIT_TAG}
+    - when: never
+
+.deploy-package:
+  stage: deploy
+  extends:
+    - .image-amd64
+    - .gitlab-runner-tag
+  script:
+    - make deploy
+  rules:
+    - if: '$CI_COMMIT_TAG'
+    - when: never
