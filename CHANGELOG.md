@@ -1,3 +1,7 @@
+## [1.1.0] - 2026-04-01
+### Changed
+- Updated base reference and improved gitlab ci workflows
+
 ## [v1.0.0] - 2026-03-24
 ### Added
 - Option to use internal toolchain extensions
