@@ -6,10 +6,6 @@
     - .gitlab-runner-tag
   script:
     - make deps
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      when: never
-    - when: always
 
 .build-aarch64-app:
   stage: build
@@ -21,7 +17,3 @@
     - make deps-extract
   script:
     - make all
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      when: never
-    - when: on_success
