@@ -1,3 +1,8 @@
+## [v1.1.2] - 2026-04-02
+### Changed
+- base: update ci ref to v2.1.1
+- base: downgrade docker tag to v2.1.1
+
 ## [v1.1.1] - 2026-04-02
 ### Fixed
 - apps/public/Makefile: remove --exclude-vcs from archive target so .git is included in app archives, enabling git submodule update in bundle integration tests
