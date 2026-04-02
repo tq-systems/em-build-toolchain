@@ -1,3 +1,7 @@
+## [v1.1.1] - 2026-04-02
+### Fixed
+- apps/public/Makefile: remove --exclude-vcs from archive target so .git is included in app archives, enabling git submodule update in bundle integration tests
+
 ## [1.1.0] - 2026-04-01
 ### Changed
 - Updated base reference and improved gitlab ci workflows
