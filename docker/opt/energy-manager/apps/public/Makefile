@@ -2,8 +2,6 @@ include /opt/energy-manager/common/public/environment.mk
 include /opt/energy-manager/common/public/artifacts.mk
 include /opt/energy-manager/common/public/version.mk
 
-include /opt/energy-manager/apps/public/package.mk
-
 export APP_ID  ?= ${TQEM_PROJECT_NAME}
 APP_NAME       ?= em-app-${APP_ID}
 
@@ -76,6 +74,9 @@ endif
 ifeq ($(BACKEND_BUILD),go-mod)
   include /opt/energy-manager/apps/public/backend-go-mod.mk
 endif
+
+# This needs to be included after setting build and service variables
+include /opt/energy-manager/apps/public/package.mk
 
 prepare: version
 	$(MAKE) backend-deps-fetch frontend-deps-fetch
