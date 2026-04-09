@@ -1,1 +1,3 @@
 ## [{{ version }}]
+### Changed
+- Update core to v9.0.1
