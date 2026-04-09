@@ -1,6 +1,8 @@
 ## [{{ version }}]
 ### Fixed
-- apps/public/Makefile: remove --exclude-vcs from archive target so .git is included in app archives, enabling git submodule update in bundle integration tests
+- apps/public/Makefile: Remove --exclude-vcs from archive target so .git is included in app
+  archives, enabling git submodule update in bundle integration tests
+- apps/public/Makefile: Move package.mk inclusion to prevent service files for apps without backend
 
 ### Changed
 - Updated base reference and improved gitlab ci workflows
