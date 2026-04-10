@@ -1,3 +1,12 @@
+## [1.0.1] - 2026-04-10
+### Changed
+- Update core to v9.0.1
+
+### Fixed
+- apps/public/Makefile: Remove --exclude-vcs from archive target so .git is included in app
+  archives, enabling git submodule update in bundle integration tests
+- apps/public/Makefile: Move package.mk inclusion to prevent service files for apps without backend
+
 ## [v1.0.0] - 2026-03-24
 ### Added
 - Option to use internal toolchain extensions
