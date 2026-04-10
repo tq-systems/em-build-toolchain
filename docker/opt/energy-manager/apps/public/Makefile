@@ -2,8 +2,6 @@ include /opt/energy-manager/common/public/environment.mk
 include /opt/energy-manager/common/public/artifacts.mk
 include /opt/energy-manager/common/public/version.mk
 
-include /opt/energy-manager/apps/public/package.mk
-
 export APP_ID  ?= ${TQEM_PROJECT_NAME}
 APP_NAME       ?= em-app-${APP_ID}
 
@@ -77,6 +75,9 @@ ifeq ($(BACKEND_BUILD),go-mod)
   include /opt/energy-manager/apps/public/backend-go-mod.mk
 endif
 
+# This needs to be included after setting build and service variables
+include /opt/energy-manager/apps/public/package.mk
+
 prepare: version
 	$(MAKE) backend-deps-fetch frontend-deps-fetch
 
@@ -89,7 +90,7 @@ all-debug: backend-debug frontend
 archive:
 	tar czf ${TQEM_DEPLOY_PATH}/${BUILD_ARCHIVE} -C ${TQEM_PROJECT_ROOT_PATH} \
 		--exclude=artifacts --exclude=deploy --exclude=frontend/container \
-		--exclude=cache --exclude-caches-all --exclude-vcs .
+		--exclude=cache --exclude-caches-all .
 
 deps: prepare
 	$(MAKE) archive
