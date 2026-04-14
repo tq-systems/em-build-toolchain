@@ -19,7 +19,10 @@ LOCAL_BASE = local/em/base
 LOCAL_TOOLCHAIN = local/em/toolchain
 
 BASE_REGISTRY ?= ${LOCAL_BASE}
-BASE_DOCKER_TAG ?= latest
+# Use reference from base.yml as default for the base docker tag
+BASE_CI_VERSION := $(shell awk '/^[[:space:]]*ref:[[:space:]]*/ {print $$2}' ci/common/base.yml | grep -E '^v[0-9]+\.' | head -n1)
+BASE_DOCKER_TAG ?= ${BASE_CI_VERSION}
+
 PUBLIC_TOOLCHAIN_REGISTRY ?= ${LOCAL_TOOLCHAIN}
 TQEM_APPS_CACHE ?= ""
 
