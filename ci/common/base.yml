@@ -1,0 +1,14 @@
+include:
+- project: tq-em/public/build/base
+  file: ci/include.yml
+  ref: v2.2.0
+  rules:
+    - if: '$BASE_CI_REF'
+      when: never
+    - when: always
+
+- project: tq-em/public/build/base
+  file: ci/include.yml
+  ref: $BASE_CI_REF
+  rules:
+    - if: '$BASE_CI_REF'
