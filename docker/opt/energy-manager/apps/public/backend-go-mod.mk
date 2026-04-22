@@ -23,12 +23,10 @@ go-release-build:
 		-o ${DIR_BACKEND_BUILD}/${FEATURE_VARIANT}/${APP_NAME}
 
 go-lint: go-deps
-	cd ${DIR_BACKEND} && golangci-lint run --timeout=10m --modules-download-mode vendor \
-		--no-config -E misspell
+	cd ${DIR_BACKEND} && golangci-lint run
 
 go-sec: go-deps
-	cd ${DIR_BACKEND} && golangci-lint run --timeout=10m --modules-download-mode vendor \
-		--no-config --disable-all -E gosec --exclude='G114,G306'
+	cd ${DIR_BACKEND} && golangci-lint run --default=none -E gosec
 
 go-test:
 	cd ${DIR_BACKEND} && go test -race -mod=vendor -v -cover \
