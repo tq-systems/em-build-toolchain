@@ -67,7 +67,7 @@ RUN git clone ${PB_URL}.git && cd protobuf && git checkout v${PB_VERSION} \
 	&& sudo make -j$(nproc) && sudo make install && rm -rf /workspace/protobuf && sudo ldconfig
 
 RUN go install go.uber.org/mock/mockgen@v0.4.0
-RUN go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.64.5
+RUN go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.11.4
 RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.36.5
 RUN go install github.com/go-delve/delve/cmd/dlv@v1.8.0
 RUN go install golang.org/x/tools/cmd/godoc@v0.1.8
@@ -77,6 +77,10 @@ RUN go install github.com/planetscale/vtprotobuf/cmd/protoc-gen-go-vtproto@v0.6.
 RUN go install github.com/tq-systems/public-go-utils/cmd/omitemptyremover@v1.0.0
 RUN go install github.com/tq-systems/em-go-licenses@v1.0.1-tq
 RUN go install github.com/CycloneDX/cyclonedx-gomod/cmd/cyclonedx-gomod@v1.9.0
+
+# Add golangci-lint default config to home dir, since golangci-lint v2 is not
+# as configurable as v1 via command line
+COPY ./docker/home/tqemci/.golangci.yml /home/${DOCKER_USER}
 
 # Files that change rapidly are processed last to improve build performance
 USER root
