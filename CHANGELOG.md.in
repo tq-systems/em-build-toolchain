@@ -6,3 +6,5 @@
 
 ### Changed
 - Updated base reference and improved gitlab ci workflows
+- Update golangci-lint to 2.11.4
+- Make targets "go-lint" and "go-sec" use a default configuration in the home directory of the docker user; this dfault configuration may be overridden by the user by providing a .golangci.yml file in the backend directory of the app repo or any directory up to root
