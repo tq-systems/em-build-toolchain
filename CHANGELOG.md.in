@@ -1,10 +1,9 @@
 ## [{{ version }}]
-### Fixed
-- apps/public/Makefile: Remove --exclude-vcs from archive target so .git is included in app
-  archives, enabling git submodule update in bundle integration tests
-- apps/public/Makefile: Move package.mk inclusion to prevent service files for apps without backend
+### Added
+- Add makefiles and ci/packages.yml entry point for building and publishing npm packages
 
 ### Changed
-- Updated base reference and improved gitlab ci workflows
 - Update golangci-lint to 2.11.4
-- Make targets "go-lint" and "go-sec" use a default configuration in the home directory of the docker user; this dfault configuration may be overridden by the user by providing a .golangci.yml file in the backend directory of the app repo or any directory up to root
+- Introduce a default config for "go-lint" and "go-sec" Make targets, it can be overridden by a
+  .golangci.yml file in the backend directory of the app repo or any directory up to root
+- Simplify base inclusion
