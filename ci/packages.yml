@@ -1,0 +1,14 @@
+include:
+  - local: 'ci/common/include.yml'
+  - local: 'ci/packages/common.yml'
+
+stages:
+  - build
+  - test
+  - deploy
+
+default:
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - node_modules/

@@ -1,3 +1,26 @@
+## [1.0.1] - 2026-04-10
+### Changed
+- Update core to v9.0.1
+
+### Fixed
+- apps/public/Makefile: Remove --exclude-vcs from archive target so .git is included in app
+  archives, enabling git submodule update in bundle integration tests
+- apps/public/Makefile: Move package.mk inclusion to prevent service files for apps without backend
+
+## [v1.1.2] - 2026-04-02
+### Changed
+- base: update ci ref to v2.1.1
+- base: downgrade docker tag to v2.1.1
+
+## [v1.1.1] - 2026-04-02
+### Fixed
+- apps/public/Makefile: Remove --exclude-vcs from archive target so .git is included in app
+  archives, enabling git submodule update in bundle integration tests
+
+## [1.1.0] - 2026-04-01
+### Changed
+- Updated base reference and improved gitlab ci workflows
+
 ## [v1.0.0] - 2026-03-24
 ### Added
 - Option to use internal toolchain extensions

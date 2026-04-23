@@ -47,8 +47,7 @@ go-coverage: go-test
 
 go-generate-code: go-deps
 	cd ${DIR_BACKEND} && go generate -v ./...
-	git-helper.sh git_check_clean "${DIR_BACKEND_REL}"
-
+	git-helper.sh check-clean "${DIR_BACKEND_REL}"
 
 go-license:
 	# workaround for go-licenses which cannot handle symlinks
