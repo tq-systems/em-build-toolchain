@@ -1,1 +1,3 @@
 ## [{{ version }}]
+### Fixed
+- Synchronize the base references to rule set
