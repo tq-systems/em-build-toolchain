@@ -1,3 +1,13 @@
+## [1.2.0] - 2026-04-23
+### Added
+- Add makefiles and ci/packages.yml entry point for building and publishing npm packages
+
+### Changed
+- Update golangci-lint to 2.11.4
+- Introduce a default config for "go-lint" and "go-sec" Make targets, it can be overridden by a
+  .golangci.yml file in the backend directory of the app repo or any directory up to root
+- Simplify base inclusion
+
 ## [1.0.1] - 2026-04-10
 ### Changed
 - Update core to v9.0.1
