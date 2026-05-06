@@ -10,15 +10,17 @@ RUN apt-get update && apt-get -y upgrade \
 	cmake cmake-curses-gui \
 	clang clang-format clang-tools \
 	cppcheck \
-	libcurl3-dev \
+	libcurl4-openssl-dev \
 	libdaemon-dev \
 	libdbus-1-dev \
 	libglib2.0-dev \
+	libgupnp-1.6-dev \
 	libjansson-dev \
 	libjson-glib-dev \
 	liblzma-dev \
 	libmosquitto-dev \
 	libmodbus-dev \
+	libsoup-3.0-dev \
 	libsqlite3-dev \
 	libssl-dev \
 	libsystemd-dev \
@@ -29,19 +31,16 @@ RUN apt-get update && apt-get -y upgrade \
 	python3-absl \
 && apt-get autoremove --yes && apt-get clean --yes
 
-# TODO: Remove this after moving to Ubuntu 24.04
-# Add Ubuntu 24.04 sources temporarily, update, install packages, and remove sources
-RUN echo 'deb http://archive.ubuntu.com/ubuntu noble main universe' > /etc/apt/sources.list.d/ubuntu-24.04.list \
-	&& apt-get update \
-	&& apt-get install -y libsoup-3.0-dev libglib2.0-dev libgupnp-1.6 libgupnp-1.6-dev \
-	&& rm -f /etc/apt/sources.list.d/ubuntu-24.04.list \
-	&& rm -rf /var/lib/apt/lists/*
-
 ARG GO_VERSION=1.25.5
 RUN wget -c -nv --no-check-certificate https://go.dev./dl/go${GO_VERSION}.linux-amd64.tar.gz -O - \
 	| tar -xz -C /usr/local
 
-RUN pip3 install cpplint gcovr lizard pytest pymodbus
+RUN pip install \
+	cpplint==2.0.2 \
+	gcovr==8.6 \
+	lizard==1.21.0 \
+	pytest==9.0.2 \
+	pymodbus==3.12.1
 
 # TODO: workaround: git clone as user and install as root - we need to install only fixed versions
 ARG DOCKER_USER
