@@ -1,3 +1,21 @@
+## [2.0.0] - 2026-05-06
+### Added
+- Add makefiles and ci/packages.yml entry point for building and publishing npm packages
+
+### Changed
+- ci: update base CI reference to v3.0.0 (Ubuntu 24.04)
+- Update golangci-lint to 2.11.4
+- Introduce a default config for "go-lint" and "go-sec" Make targets, it can be overridden by a
+  .golangci.yml file in the backend directory of the app repo or any directory up to root
+- Simplify base inclusion
+- amd64.Dockerfile: replace libcurl3-dev with libcurl4-openssl-dev for Ubuntu 24 compatibility
+- amd64.Dockerfile: add libsoup-3.0-dev and libgupnp-1.6-dev to regular package install, remove Ubuntu 24 workaround
+- docker: install Python tools (including python-gitlab) in venv with pinned versions for Ubuntu 24.04
+- common.Dockerfile: install python3-venv for venv support
+
+### Removed
+- amd64.Dockerfile: remove temporary Ubuntu 24.04 noble apt-sources workaround
+
 ## [1.0.1] - 2026-04-10
 ### Changed
 - Update core to v9.0.1
