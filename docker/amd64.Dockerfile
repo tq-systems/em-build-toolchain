@@ -31,7 +31,7 @@ RUN apt-get update && apt-get -y upgrade \
 	python3-absl \
 && apt-get autoremove --yes && apt-get clean --yes
 
-ARG GO_VERSION=1.25.5
+ARG GO_VERSION=1.25.10
 RUN wget -c -nv --no-check-certificate https://go.dev./dl/go${GO_VERSION}.linux-amd64.tar.gz -O - \
 	| tar -xz -C /usr/local
 
@@ -45,7 +45,7 @@ RUN pip install \
 # TODO: workaround: git clone as user and install as root - we need to install only fixed versions
 ARG DOCKER_USER
 USER ${DOCKER_USER}
-ARG LIBDEVICEINFO_VERSION=1.8.0
+ARG LIBDEVICEINFO_VERSION=1.9.0
 RUN git clone https://github.com/tq-systems/libdeviceinfo-em.git libdeviceinfo \
 	&& cd libdeviceinfo && git checkout v${LIBDEVICEINFO_VERSION} \
 	&& mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr .. && make

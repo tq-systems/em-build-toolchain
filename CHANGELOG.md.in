@@ -12,6 +12,9 @@
 - amd64.Dockerfile: add libsoup-3.0-dev and libgupnp-1.6-dev to regular package install, remove Ubuntu 24 workaround
 - docker: install Python tools (including python-gitlab) in venv with pinned versions for Ubuntu 24.04
 - common.Dockerfile: install python3-venv for venv support
+- Go: update to 1.25.10
+- Node: update to 22.13.1
+- libdeviceinfo: update to 1.9.0
 
 ### Removed
 - amd64.Dockerfile: remove temporary Ubuntu 24.04 noble apt-sources workaround
