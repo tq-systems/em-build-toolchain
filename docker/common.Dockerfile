@@ -34,7 +34,7 @@ RUN apt-get update && apt-get -y upgrade && apt-get install -y \
 	unzip
 
 # Install a fixed node version
-ARG NODE_VERSION=22.13.0
+ARG NODE_VERSION=22.13.1
 RUN apt-get install -y nodejs=${NODE_VERSION}-1nodesource1 && apt-mark hold nodejs
 
 # prepare working directory
