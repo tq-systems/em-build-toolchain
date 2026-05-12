@@ -1,5 +1,6 @@
 ## [{{ version }}]
 ### Added
+- A profile directory, containing default configurations, is now added to empkg files
 
 ### Changed
 - ci: Update base ci reference to v3.1.0

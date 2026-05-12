@@ -171,7 +171,14 @@ ifneq ($(FILE_DBUS_CONF),)
 	install -m 644 ${FILE_DBUS_CONF} ${DIR_PACKAGE}/${BUILD_VARIANT}/pkg_root${DIR_APP_ROOT}/dbus.conf
 endif
 
-empkg-data: empkg-service empkg-license empkg-firewall empkg-dbus-conf empkg-manifest
+empkg-profile: empkg-prepare
+	$(eval PKG_DIR_PROFILE = ${DIR_PACKAGE}/${BUILD_VARIANT}/pkg_root${DIR_APP_ROOT}/${DIR_PROFILE_REL})
+	if test -d ${DIR_PROFILE}; then \
+		install -d ${PKG_DIR_PROFILE}; \
+		rsync -a ${DIR_PROFILE}/ ${PKG_DIR_PROFILE}/; \
+	fi
+
+empkg-data: empkg-service empkg-license empkg-firewall empkg-dbus-conf empkg-manifest empkg-profile
 
 LINK_VERSION ?= latest
 
