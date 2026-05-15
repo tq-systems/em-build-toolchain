@@ -1,3 +1,10 @@
+## [2.0.1] - 2026-05-15
+### Changed
+- ci: update base CI reference to v3.0.2
+- Go: update to 1.25.10
+- Node: update to 22.13.1
+- libdeviceinfo: update to 1.9.0
+
 ## [2.0.0] - 2026-05-06
 ### Changed
 - ci: update base CI reference to v3.0.0 (Ubuntu 24.04)
