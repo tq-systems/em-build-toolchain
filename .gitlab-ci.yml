@@ -28,15 +28,14 @@ Test All Builds:
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH || $CI_COMMIT_TAG
       when: never
-    - if: >
-        $CI_PIPELINE_SOURCE == "merge_request_event"
-        && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       variables:
         DEPLOY_TEST_IMAGES: 'true'
         BUILD_TAG: 'mr-${CI_MERGE_REQUEST_IID}'
     - if: $TRIGGER_TESTS == 'true'
       variables:
         DEPLOY_TEST_IMAGES: 'true'
+    - when: always
 
 Gitleaks:
   extends: .gitleaks
@@ -87,9 +86,7 @@ Other Images:
     BASE_CI_REF: 'main'
     PUBLIC_TOOLCHAIN_CI_REF: $CI_COMMIT_REF_NAME
   rules:
-    - if: >
-        $CI_PIPELINE_SOURCE == "merge_request_event"
-        && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       variables:
         PUBLIC_TOOLCHAIN_DOCKER_TAG: 'mr-${CI_MERGE_REQUEST_IID}'
     - if: $TRIGGER_TESTS == 'true' && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
