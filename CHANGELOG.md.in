@@ -2,8 +2,9 @@
 ### Added
 
 ### Changed
+- ci: Update base ci reference to v3.1.0
 
 ### Fixed
-- base-latest: update app versions
+- base-latest: Update app versions
 
 ### Removed
