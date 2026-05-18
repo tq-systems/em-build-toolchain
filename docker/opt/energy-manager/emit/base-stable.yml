@@ -4,33 +4,33 @@ defaults:
 
 apps:
   button-handler:
-    version: '3.0.7'
+    version: '3.0.9'
 
   data-transfer:
-    version: '4.1.2'
+    version: '4.1.4'
 
   device-settings:
-    version: '5.0.6'
+    version: '6.5.4'
 
   flash-scan:
-    version: '2.2.9'
+    version: '2.2.10'
 
   health-check:
-    version: '3.0.1'
+    version: '3.0.3'
 
   teridiand:
-    version: '1.11.3'
+    version: '1.11.5'
 
   teridiand-fw:
     arch: 'all'
-    version: '1.3.6'
+    version: '1.3.7'
 
   ui-container:
     arch: 'all'
-    version: '1.2.2'
+    version: '2.4.0'
 
   updater:
-    version: '2.0.7'
+    version: '2.3.1'
 
   web-login:
-    version: '3.2.1'
+    version: '3.2.4'
