@@ -9,11 +9,6 @@ stages:
   - trigger-app
   - trigger-bundle
 
-.docker-build:
-  extends:
-    - .image-docker
-    - .before-script-docker-login
-
 Shell Linter:
   extends:
     - .lint-shell
