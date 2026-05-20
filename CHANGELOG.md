@@ -1,3 +1,12 @@
+## [2.0.2] - 2026-05-20
+### Changed
+- ci: Update base ci reference to v3.1.0
+- amd64: Update Go from 1.25.10 to 1.26.3
+- common: Add pyyaml to the venv
+
+### Fixed
+- base-latest: Update app versions
+
 ## [2.0.1] - 2026-05-15
 ### Changed
 - ci: update base CI reference to v3.0.2
