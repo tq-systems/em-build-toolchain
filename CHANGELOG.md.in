@@ -2,11 +2,7 @@
 ### Added
 
 ### Changed
-- ci: Update base ci reference to v3.1.0
-- amd64: Update Go from 1.25.10 to 1.26.3
-- common: Add pyyaml to the venv
 
 ### Fixed
-- base-latest: Update app versions
 
 ### Removed
