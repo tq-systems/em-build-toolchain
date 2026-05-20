@@ -72,7 +72,7 @@ ENV PATH=/opt/venv/bin:/home/${DOCKER_USER}/.local/bin:$PATH
 RUN printf "tqemci ALL=(ALL) NOPASSWD:ALL\n" >> /etc/sudoers
 
 RUN python3 -m venv /opt/venv \
-	&& pip install python-gitlab==8.2.0
+	&& pip install python-gitlab==8.2.0 pyyaml==6.0.1
 
 # Enable to use the scripts in further images
 COPY ./scripts/*.sh /usr/local/bin/
