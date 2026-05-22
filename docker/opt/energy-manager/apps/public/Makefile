@@ -1,14 +1,13 @@
 include /opt/energy-manager/common/public/environment.mk
 include /opt/energy-manager/common/public/artifacts.mk
 include /opt/energy-manager/common/public/version.mk
+include /opt/energy-manager/common/public/deploy.mk
 
 export APP_ID  ?= ${TQEM_PROJECT_NAME}
 APP_NAME       ?= em-app-${APP_ID}
 
-# Deployment
 TQEM_DEPLOY_SOURCE_PATH ?= ${TQEM_DEPLOY_PATH}
 TQEM_DEPLOY_DESTINATION_PATH ?= ${TQEM_APPS_DEPLOY_PATH}/${APP_ID}/${TQEM_DEPLOYMENT_SUBDIR}
-include /opt/energy-manager/common/public/deploy.mk
 
 DIR_APP_ROOT = /apps/installed/${APP_ID}
 DIR_PACKAGE  = ${TQEM_ARTIFACTS_PATH}/package

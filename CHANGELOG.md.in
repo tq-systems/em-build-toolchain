@@ -2,6 +2,7 @@
 ### Added
 
 ### Changed
+- Ensure that snapshots are deployed to a subdirectory derived from the branch
 
 ### Fixed
 
