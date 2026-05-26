@@ -1,3 +1,7 @@
+## [2.0.3] - 2026-05-22
+### Changed
+- Ensure that snapshots are deployed to a subdirectory derived from the branch
+
 ## [2.0.2] - 2026-05-20
 ### Changed
 - ci: Update base ci reference to v3.1.0
