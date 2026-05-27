@@ -89,9 +89,10 @@ all-debug: backend-debug frontend
 	$(MAKE) empkg
 
 archive:
+	git -C ${TQEM_PROJECT_ROOT_PATH} submodule update --init --recursive
 	tar czf ${TQEM_DEPLOY_PATH}/${BUILD_ARCHIVE} -C ${TQEM_PROJECT_ROOT_PATH} \
 		--exclude=artifacts --exclude=deploy --exclude=frontend/container \
-		--exclude=cache --exclude-caches-all .
+		--exclude=cache --exclude-caches-all --exclude-vcs .
 
 deps: prepare
 	$(MAKE) archive

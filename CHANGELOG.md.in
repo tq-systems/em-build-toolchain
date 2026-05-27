@@ -3,6 +3,9 @@
 
 ### Changed
 - Simplified deploymant behavior (again)
+- Ensure that snapshots are deployed to a subdirectory derived from the branch
+- apps/public/Makefile: archive target resolves git submodules into the working tree and re-enables
+  --exclude-vcs so snapshot archives contain dependencies but no VCS metadata
 
 ### Fixed
 
