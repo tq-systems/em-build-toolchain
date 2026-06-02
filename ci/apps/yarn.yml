@@ -1,0 +1,6 @@
+.yarn-audit:
+  stage: test
+  extends:
+    - .gitlab-runner-tag
+  script:
+    - make yarn-audit
