@@ -5,5 +5,4 @@
     - .image-aarch64
     - .gitlab-runner-tag
   script:
-    - make prepare
     - make build

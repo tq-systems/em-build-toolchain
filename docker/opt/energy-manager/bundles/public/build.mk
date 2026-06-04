@@ -47,11 +47,18 @@ endif
 bootloader-arg = --bootloader '$(word 1,$(1))' '/opt/energy-manager/emit/${MACHINE}/$(word 2,$(1))'
 bootloader-args = $(foreach bootloader,$(1),$(call bootloader-arg,$(subst =, ,$(bootloader))))
 
-emit-download:
-	env SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt \
-		emit ${EMIT_BASE_ARGS} download
+APP_DOWNLOAD_DIR ?= downloads
+# We have to use '=' instead of ':=' here as the arguments may be adapted later
+APP_DOWNLOAD_CMD = env SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt \
+	emit ${EMIT_BASE_ARGS} download
 
-emit-build:
+emit-download:
+	$(APP_DOWNLOAD_CMD)
+
+${APP_DOWNLOAD_DIR}:
+	$(APP_DOWNLOAD_CMD)
+
+emit-build: version ${APP_DOWNLOAD_DIR}
 	$(eval DEVICE_TYPE     = $(shell tqem-device.sh type ${TQEM_MACHINE}))
 	$(eval DEVICE_SUBTYPE  = $(shell tqem-device.sh subtype ${TQEM_MACHINE}))
 	$(eval MACHINE         = $(shell tqem-device.sh machine ${TQEM_MACHINE}))
@@ -69,7 +76,6 @@ emit-build:
 	emit ${EMIT_BASE_ARGS} ${EMIT_COMPRESSION_ARG} build ${EMIT_BUILD_ARGS} \
 		$(call bootloader-args,$(BOOTLOADERS))
 
-bundle-build: emit-download
-	$(MAKE) emit-build
+build: emit-build
 
-build: emit-download bundle-build build
+.PHONY: emit-download emit-build build

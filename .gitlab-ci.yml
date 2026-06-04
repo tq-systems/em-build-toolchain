@@ -103,7 +103,7 @@ Other Images:
         PUBLIC_TOOLCHAIN_DOCKER_TAG: $BUILD_TAG
 
 
-Trigger App Build:
+Trigger Go Demo App:
   stage: trigger-app
   extends: .trigger-tests
   variables:
@@ -111,6 +111,16 @@ Trigger App Build:
   trigger:
     project: tq-em/public/apps/go-demo
     branch: ${GO_DEMO_APP_BRANCH}
+    strategy: depend
+
+Trigger Open UI Container App:
+  stage: trigger-app
+  extends: .trigger-tests
+  variables:
+    OPEN_UI_CONTAINER_APP_BRANCH: 'main'
+  trigger:
+    project: tq-em/public/apps/open-ui-container
+    branch: ${OPEN_UI_CONTAINER_APP_BRANCH}
     strategy: depend
 
 Trigger Bundle Build:

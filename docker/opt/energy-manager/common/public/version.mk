@@ -5,6 +5,7 @@ ${VERSION_PATH}: artifact-dirs
 	tqem-version.sh > ${VERSION_PATH}
 
 version: ${VERSION_PATH}
+	$(eval VERSION = $(shell cat ${VERSION_PATH}))
 
 version-clean:
 	rm -f ${VERSION_PATH}
