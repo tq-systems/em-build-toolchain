@@ -81,17 +81,18 @@ endef
 
 empkg-prepare:
 	$(eval DIR_PKG_ARCHIVE = ${DIR_PACKAGE}/${BUILD_VARIANT}/pkg_archive)
-	$(eval DIR_PKG_LICENSE = ${DIR_PACKAGE}/${BUILD_VARIANT}/pkg_root${DIR_APP_ROOT}/license)
-	mkdir -p ${DIR_PKG_ARCHIVE} ${DIR_PKG_LICENSE}
+	$(eval DIR_PKG_ROOT_APP = ${DIR_PACKAGE}/${BUILD_VARIANT}/pkg_root${DIR_APP_ROOT})
+	mkdir -p ${DIR_PKG_ARCHIVE} ${DIR_PKG_ROOT_APP}
 
 empkg-service: empkg-prepare
 ifneq ($(SERVICE_BUILD),0)
-	echo "$$SERVICE_CONTENT" > ${DIR_PACKAGE}/${BUILD_VARIANT}/pkg_root${DIR_APP_ROOT}/${SERVICE_FILE}
+	echo "$$SERVICE_CONTENT" > ${DIR_PKG_ROOT_APP}/${SERVICE_FILE}
 endif
 
 empkg-license: empkg-prepare
-	$(eval DIR_PKG_LICENSE = ${DIR_PACKAGE}/${BUILD_VARIANT}/pkg_root${DIR_APP_ROOT}/license)
-	cp -f  LICENSE ${DIR_PKG_LICENSE}
+	$(eval DIR_PKG_LICENSE = ${DIR_PKG_ROOT_APP}/license)
+	install -d ${DIR_PKG_LICENSE}
+	install -m 644 LICENSE ${DIR_PKG_LICENSE}
 
 	echo "$$README_GENERAL"      > ${DIR_PKG_LICENSE}/README
 	if [ -f ${DIR_PKG_LICENSE}/${APP_ID}.golang.manifest ]; then \
@@ -105,6 +106,7 @@ MANIFEST_DEFAULT_OWN_PATHS = \
 	"${SERVICE_RUN_DIR}" \
 	"/cfglog/apps/${APP_ID}"
 
+# Prevent a recursive reference error by using ':='
 MANIFEST_OWN_PATHS := ${MANIFEST_DEFAULT_OWN_PATHS} ${MANIFEST_OWN_PATHS}
 MANIFEST_RW_PATHS ?=
 MANIFEST_RO_PATHS ?=
@@ -125,7 +127,6 @@ APPCLASS = no-time
 endif
 
 empkg-manifest: empkg-prepare
-	$(eval DIR_PKG_ARCHIVE = ${DIR_PACKAGE}/${BUILD_VARIANT}/pkg_archive)
 	$(eval MANIFEST_EXTRA_JSON = $(shell jq -c --argjson manifest_own_json '$(call args2json,$(MANIFEST_OWN_PATHS))' \
 						--argjson manifest_rw_json '$(call args2json,$(MANIFEST_RW_PATHS))' \
 						--argjson manifest_ro_json '$(call args2json,$(MANIFEST_RO_PATHS))' \
@@ -156,42 +157,51 @@ ifneq ($(or $(EM_FW_ALLOW_PROTOCOL),$(EM_FW_ALLOW_PORT)),)
 endif
 endif
 ifneq ($(FILE_EM_FW_CONF),)
-	install -d ${DIR_PACKAGE}/${BUILD_VARIANT}/pkg_root${DIR_APP_ROOT}
-	install -m 644 ${FILE_EM_FW_CONF} ${DIR_PACKAGE}/${BUILD_VARIANT}/pkg_root${DIR_APP_ROOT}/em-fw.conf
+	install -m 644 ${FILE_EM_FW_CONF} ${DIR_PKG_ROOT_APP}/em-fw.conf
 else
 ifneq ($(and $(EM_FW_ALLOW_PROTOCOL),$(EM_FW_ALLOW_PORT)),)
-	install -d ${DIR_PACKAGE}/${BUILD_VARIANT}/pkg_root${DIR_APP_ROOT}
-	echo "$$SIMPLE_FW_CONFIG" > ${DIR_PACKAGE}/${BUILD_VARIANT}/pkg_root${DIR_APP_ROOT}/em-fw.conf
+	echo "$$SIMPLE_FW_CONFIG" > ${DIR_PKG_ROOT_APP}/em-fw.conf
 endif
 endif
 
 empkg-dbus-conf: empkg-prepare
 ifneq ($(FILE_DBUS_CONF),)
-	install -d ${DIR_PACKAGE}/${BUILD_VARIANT}/pkg_root${DIR_APP_ROOT}
-	install -m 644 ${FILE_DBUS_CONF} ${DIR_PACKAGE}/${BUILD_VARIANT}/pkg_root${DIR_APP_ROOT}/dbus.conf
+	install -m 644 ${FILE_DBUS_CONF} ${DIR_PKG_ROOT_APP}/dbus.conf
 endif
 
-empkg-data: empkg-service empkg-license empkg-firewall empkg-dbus-conf empkg-manifest
+# Allow you to customise the profile directory for different variants
+EMPKG_PROFILE_SRC_DIR ?= ${DIR_PROFILE}
+PKG_DIR_PROFILE = ${DIR_PKG_ROOT_APP}/${DIR_PROFILE_REL}
+
+# This command is used in toolchain extensions
+EMPKG_COPY_PROFILE = if test -d ${EMPKG_PROFILE_SRC_DIR}; then \
+		install -d ${PKG_DIR_PROFILE}; \
+		rsync -a ${EMPKG_PROFILE_SRC_DIR}/ ${PKG_DIR_PROFILE}/; \
+	fi
+
+empkg-profile: empkg-prepare
+	$(EMPKG_COPY_PROFILE)
+
+empkg-data: empkg-service empkg-license empkg-firewall empkg-dbus-conf empkg-manifest empkg-profile
 
 LINK_VERSION ?= latest
+EMPKG_TAR := tar --numeric-owner --owner=0 --group=0
 
-empkg-pack:
+empkg-build: empkg-data
 	$(eval PKG_FILE = ${APP_ID}${APP_ID_SUFFIX}_${VERSION}_${PKG_ARCH}.${APP_FILE_SUFFIX})
 	$(eval PKG_LINK = ${APP_ID}${APP_ID_SUFFIX}_${LINK_VERSION}_${PKG_ARCH}.${APP_FILE_SUFFIX})
-	$(eval DIR_PKG_ARCHIVE = ${DIR_PACKAGE}/${BUILD_VARIANT}/pkg_archive)
 
-	tar --numeric-owner --owner=0 --group=0 -cJf ${DIR_PKG_ARCHIVE}/data.tar.xz -C ${DIR_PACKAGE}/${BUILD_VARIANT}/pkg_root${DIR_APP_ROOT} .
-	tar --numeric-owner --owner=0 --group=0 -cf ${TQEM_DEPLOY_PATH}/${PKG_FILE} -C ${DIR_PKG_ARCHIVE} manifest.json data.tar.xz
+	$(EMPKG_TAR) -cJf ${DIR_PKG_ARCHIVE}/data.tar.xz -C ${DIR_PKG_ROOT_APP} .
+	$(EMPKG_TAR) -cf ${TQEM_DEPLOY_PATH}/${PKG_FILE} -C ${DIR_PKG_ARCHIVE} manifest.json data.tar.xz
 	test "${PKG_FILE}" = "${PKG_LINK}" || ln -sf ${PKG_FILE} ${TQEM_DEPLOY_PATH}/${PKG_LINK}
 	sha256sum ${TQEM_DEPLOY_PATH}/${PKG_FILE} | awk '{ print $$1 }' > ${TQEM_DEPLOY_PATH}/${PKG_FILE}.sha256
 
-empkg-build: empkg-data
-	$(MAKE) empkg-pack
+EMPKG_PREREQS = empkg-build
 
-empkg: empkg-build
+empkg: $$(EMPKG_PREREQS)
 
 empkg-clean:
 	rm -rf ${DIR_PACKAGE}
 
 .PHONY: empkg-prepare empkg-service empkg-license empkg-manifest empkg-firewall empkg-dbus-conf \
-	empkg-data empkg-pack empkg-build empkg empkg-clean
+	empkg-data empkg-build empkg empkg-clean

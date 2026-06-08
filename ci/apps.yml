@@ -2,6 +2,7 @@ include:
   - local: 'ci/common/include.yml'
   - local: 'ci/apps/build.yml'
   - local: 'ci/apps/golang.yml'
+  - local: 'ci/apps/yarn.yml'
 
 # Deploy stage is handled by ci/common/deploy.yml
 

@@ -1,25 +1,26 @@
 DIR_FRONTEND_BUILD = ${DIR_FRONTEND}/dist
 DIR_CON_FRONTEND   = ${DIR_FRONTEND}/container/frontend
 DIR_CON_APP        = ${DIR_CON_FRONTEND}/apps/${APP_ID}
+DIR_NODE_MODULES   = ${DIR_FRONTEND}/node_modules
+
+YARN_INSTALL = cd ${DIR_FRONTEND} && yarn install --immutable
 
 -include ${DIR_FRONTEND}/.env
 
+# BUILD
 yarn-deps:
-	cd ${DIR_FRONTEND} && COREPACK_ENABLE_DOWNLOAD_PROMPT=0 yarn install --immutable
+	$(YARN_INSTALL)
+
+${DIR_NODE_MODULES}:
+	$(YARN_INSTALL)
 
 yarn-deps-extract:
 	rm -rf ./${DIR_FRONTEND_REL}/node_modules \
 		&& tar xzf ${TQEM_DEPLOY_PATH}/${BUILD_ARCHIVE} ./${DIR_FRONTEND_REL}/node_modules
 
-yarn-test-unit: yarn-deps
-	cd ${DIR_FRONTEND} && yarn test:unit
-
-yarn-audit:
-	cd ${DIR_FRONTEND} && yarn npm audit
-
-yarn-release:
-	cd ${DIR_FRONTEND} && BUILD_VARIANT=${BUILD_VARIANT} yarn run build \
-		--output-path ${DIR_FRONTEND_BUILD}
+# We cannot rename 'yarn-release' to 'yarn-build' due to some backwards compatibility issues
+yarn-release: ${DIR_NODE_MODULES}
+	cd ${DIR_FRONTEND} && yarn run build --output-path ${DIR_FRONTEND_BUILD}
 
 yarn-push:
 	$(eval DIR_PKG_WWW = ${DIR_PACKAGE}/${BUILD_VARIANT}/pkg_root${DIR_APP_ROOT}/www)
@@ -49,13 +50,24 @@ yarn-clean:
 yarn-upgrade:
 	cd ${DIR_FRONTEND} && yarn -R up '**' && yarn dedupe
 
-frontend-prepare:      yarn-deps
-frontend-deps-fetch:   yarn-deps
-frontend-deps-extract: yarn-deps-extract
-frontend-release:      yarn-release
-frontend-finish:       yarn-push
-frontend-clean:        yarn-clean
-frontend-upgrade:      yarn-upgrade
+YARN_FINISH_PREREQS = yarn-push
 
-.PHONY: yarn-deps yarn-deps-extract yarn-test-unit yarn-audit yarn-release \
-	yarn-push yarn-clean yarn-upgrade \
+frontend-prepare:         yarn-deps
+frontend-deps-fetch:      yarn-deps
+frontend-deps-extract:    yarn-deps-extract
+frontend-build:           yarn-release
+frontend-empkg-artifacts: # No further frontend artifacts for empkg
+frontend-finish:          $$(YARN_FINISH_PREREQS)
+frontend-clean:           yarn-clean
+frontend-upgrade:         yarn-upgrade
+
+.PHONY: yarn-deps yarn-deps-extract yarn-release yarn-push yarn-clean yarn-upgrade
+
+# TEST
+yarn-test-unit: ${DIR_NODE_MODULES}
+	cd ${DIR_FRONTEND} && yarn test:unit
+
+yarn-audit: ${DIR_NODE_MODULES}
+	cd ${DIR_FRONTEND} && yarn npm audit
+
+.PHONY: yarn-test-unit yarn-audit

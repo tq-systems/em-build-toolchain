@@ -22,7 +22,6 @@ export TQEM_APPS_CACHE_PATH     ?= $(HOME)/workspace/tqem/cache/apps
 
 # Variables
 export TQEM_GIT_REFERENCE ?= $(shell git describe --exact-match --tags HEAD 2>/dev/null \
-	|| git symbolic-ref --short HEAD 2>/dev/null || git rev-parse --short HEAD)
-export TQEM_GIT_BRANCH    ?= $(shell git branch --show-current 2>/dev/null)
+	|| git symbolic-ref --short HEAD 2>/dev/null || git rev-parse --short=8 HEAD)
 export TQEM_PROJECT_URL   ?= $(shell git remote get-url origin)
 export TQEM_PROJECT_NAME  ?= $(shell basename "${TQEM_PROJECT_URL}" .git)
