@@ -1,3 +1,19 @@
+## [2.0.4] - 2026-06-08
+### Added
+- Add .SECONDEXPANSION to enable overwriting prerequisites
+
+### Changed
+- Simplified deployment behavior (again)
+- Ensure that snapshots are deployed to a subdirectory derived from the branch
+- apps/public/Makefile: archive target resolves git submodules into the working tree and re-enables
+  --exclude-vcs so snapshot archives contain dependencies but no VCS metadata
+- The target prerequisites have been improved based on the dependency trees
+
+### Removed
+- recursive Make commands
+- Some make targets for intermediate steps were removed:
+  backend-debug, backend-release, frontend-release, bundle-build, empkg-pack
+
 ## [2.0.3] - 2026-05-22
 ### Changed
 - Ensure that snapshots are deployed to a subdirectory derived from the branch
