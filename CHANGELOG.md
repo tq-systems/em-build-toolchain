@@ -1,3 +1,8 @@
+## [2.0.5] - 2026-06-11
+### Changed
+- ci: bump base CI ref to v3.1.2
+- pin em-build to v9.0.3 so the aarch64 bootloader and SDK come from a fixed release instead of master snapshots
+
 ## [2.0.4] - 2026-06-08
 ### Added
 - Add .SECONDEXPANSION to enable overwriting prerequisites
