@@ -1,3 +1,7 @@
+## [2.0.6] - 2026-06-12
+### Fixed
+- Prevent overriding the VERSION.txt file during emit-build
+
 ## [2.0.5] - 2026-06-11
 ### Changed
 - ci: bump base CI ref to v3.1.2
