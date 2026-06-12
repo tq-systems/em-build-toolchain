@@ -58,7 +58,7 @@ emit-download:
 ${APP_DOWNLOAD_DIR}:
 	$(APP_DOWNLOAD_CMD)
 
-emit-build: version ${APP_DOWNLOAD_DIR}
+emit-build: ${APP_DOWNLOAD_DIR}
 	$(eval DEVICE_TYPE     = $(shell tqem-device.sh type ${TQEM_MACHINE}))
 	$(eval DEVICE_SUBTYPE  = $(shell tqem-device.sh subtype ${TQEM_MACHINE}))
 	$(eval MACHINE         = $(shell tqem-device.sh machine ${TQEM_MACHINE}))
