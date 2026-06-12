@@ -79,3 +79,8 @@ COPY ./scripts/*.sh /usr/local/bin/
 
 # Enable to use the local usr dir in further images
 COPY ./docker/usr/local/ /usr/local/
+
+# Placed last so a changing BUILD_TAG does not invalidate the cache of the
+# expensive layers above
+ARG BUILD_TAG=latest
+ENV PUBLIC_TOOLCHAIN_DOCKER_TAG=${BUILD_TAG}
