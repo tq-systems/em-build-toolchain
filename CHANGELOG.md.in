@@ -1,1 +1,3 @@
 ## [{{ version }}]
+### Fixed
+- Prevent overriding the VERSION.txt file during emit-build
