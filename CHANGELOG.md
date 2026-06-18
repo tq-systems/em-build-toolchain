@@ -1,3 +1,8 @@
+## [2.0.7] - 2026-06-18
+### Added
+- common image now exports PUBLIC_TOOLCHAIN_DOCKER_TAG as an ENV variable so the image version is
+  readable from inside a running container; amd64 and aarch64 inherit this via their common base
+
 ## [2.0.6] - 2026-06-12
 ### Fixed
 - Prevent overriding the VERSION.txt file during emit-build
