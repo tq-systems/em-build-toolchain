@@ -1,3 +1,7 @@
+## [2.0.8] - 2026-06-22
+### Changed
+- em-build: update to v9.0.4
+
 ## [2.0.7] - 2026-06-18
 ### Added
 - common image now exports PUBLIC_TOOLCHAIN_DOCKER_TAG as an ENV variable so the image version is
