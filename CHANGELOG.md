@@ -1,3 +1,7 @@
+## [2.0.9] - 2026-07-06
+### Added
+- prepare.sh: Add argument for core subdirectory
+
 ## [2.0.8] - 2026-06-22
 ### Changed
 - em-build: update to v9.0.4
