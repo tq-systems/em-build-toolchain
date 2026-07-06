@@ -5,16 +5,17 @@ set -e
 
 COMMAND="$1"
 EM_BUILD_REF="$2"
+SUBDIR="$3"
 
 # em-build releases have a semantic version tag (e.g. v1.2.3)
 if [[ "$EM_BUILD_REF" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
 	VERSION="-${EM_BUILD_REF#v}"     # Add '-' and remove 'v' for version string
 	ROOTFS_VERSION="$VERSION.rootfs" # Add suffix for core image releases only
-	SUBDIR="releases"
+	[ -z "$SUBDIR" ] && SUBDIR="releases"
 else
 	VERSION=""
 	ROOTFS_VERSION=""
-	SUBDIR="snapshots"
+	[ -z "$SUBDIR" ] && SUBDIR="snapshots"
 fi
 
 # Filenames with or without version
