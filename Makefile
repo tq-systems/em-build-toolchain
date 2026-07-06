@@ -6,11 +6,11 @@ all: prepare-files
 	$(MAKE) $(IMAGE)
 
 prepare:
-	./prepare.sh env ${EM_BUILD_REF}
+	./prepare.sh env ${EM_BUILD_REF} ${TQEM_CORE_TYPE}
 
 prepare-files: prepare
 	mkdir -p ${TQEM_TMP_PATH}
-	./prepare.sh files ${EM_BUILD_REF}
+	./prepare.sh files ${EM_BUILD_REF} ${TQEM_CORE_TYPE}
 
 common: prepare
 	${DOCKER_COMPOSE_BUILD} common
