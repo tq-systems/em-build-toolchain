@@ -1,3 +1,8 @@
+## [2.0.10] - 2026-07-13
+### Changed
+- em-build: update to v9.0.5
+- ci: bump base CI ref to v3.1.4
+
 ## [2.0.9] - 2026-07-06
 ### Added
 - prepare.sh: Add argument for core subdirectory
