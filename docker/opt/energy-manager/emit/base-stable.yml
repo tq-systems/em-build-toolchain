@@ -19,11 +19,7 @@ apps:
     version: '3.0.3'
 
   teridiand:
-    version: '1.11.5'
-
-  teridiand-fw:
-    arch: 'all'
-    version: '1.3.7'
+    version: '2.0.0'
 
   ui-container:
     arch: 'all'
