@@ -1,3 +1,25 @@
+## [2.0.10] - 2026-07-13
+### Changed
+- em-build: update to v9.0.5
+- ci: bump base CI ref to v3.1.4
+
+## [2.0.9] - 2026-07-06
+### Added
+- prepare.sh: Add argument for core subdirectory
+
+## [2.0.8] - 2026-06-22
+### Changed
+- em-build: update to v9.0.4
+
+## [2.0.7] - 2026-06-18
+### Added
+- common image now exports PUBLIC_TOOLCHAIN_DOCKER_TAG as an ENV variable so the image version is
+  readable from inside a running container; amd64 and aarch64 inherit this via their common base
+
+## [2.0.6] - 2026-06-12
+### Fixed
+- Prevent overriding the VERSION.txt file during emit-build
+
 ## [2.0.5] - 2026-06-11
 ### Changed
 - ci: bump base CI ref to v3.1.2
@@ -117,4 +139,3 @@
 ## [v0.1.0] - 2025-08-18
 ### Added
 - First toolchain release
-
