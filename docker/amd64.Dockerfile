@@ -31,16 +31,16 @@ RUN apt-get update && apt-get -y upgrade \
 	python3-absl \
 && apt-get autoremove --yes && apt-get clean --yes
 
-ARG GO_VERSION=1.26.3
+ARG GO_VERSION=1.26.5
 RUN wget -c -nv --no-check-certificate https://go.dev./dl/go${GO_VERSION}.linux-amd64.tar.gz -O - \
 	| tar -xz -C /usr/local
 
 RUN pip install \
 	cpplint==2.0.2 \
 	gcovr==8.6 \
-	lizard==1.21.0 \
-	pytest==9.0.2 \
-	pymodbus==3.12.1
+	lizard==1.23.0 \
+	pytest==9.1.1 \
+	pymodbus==3.14.0
 
 # TODO: workaround: git clone as user and install as root - we need to install only fixed versions
 ARG DOCKER_USER
@@ -54,7 +54,7 @@ RUN make -C libdeviceinfo/build install && rm -r libdeviceinfo
 
 USER ${DOCKER_USER}
 
-ARG PB_VERSION=25.3
+ARG PB_VERSION=25.9
 ARG PB_URL="https://github.com/protocolbuffers/protobuf"
 ARG PB_FILE="protoc-${PB_VERSION}-linux-x86_64.zip"
 RUN curl -LO ${PB_URL}/releases/download/v${PB_VERSION}/${PB_FILE} \
@@ -65,17 +65,16 @@ RUN git clone ${PB_URL}.git && cd protobuf && git checkout v${PB_VERSION} \
 		-DCMAKE_BUILD_TYPE=Release ../.. \
 	&& sudo make -j$(nproc) && sudo make install && rm -rf /workspace/protobuf && sudo ldconfig
 
-RUN go install go.uber.org/mock/mockgen@v0.4.0
-RUN go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.11.4
-RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.36.5
-RUN go install github.com/go-delve/delve/cmd/dlv@v1.8.0
-RUN go install golang.org/x/tools/cmd/godoc@v0.1.8
+RUN go install go.uber.org/mock/mockgen@v0.6.0
+RUN go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.12.2
+RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.36.11
+RUN go install github.com/go-delve/delve/cmd/dlv@v1.27.1
+RUN go install golang.org/x/tools/cmd/godoc@v0.36.0
 RUN go install github.com/jstemmer/go-junit-report@v0.9.1
-RUN go install github.com/zricethezav/gitleaks/v8@v8.15.1
 RUN go install github.com/planetscale/vtprotobuf/cmd/protoc-gen-go-vtproto@v0.6.0
-RUN go install github.com/tq-systems/public-go-utils/cmd/omitemptyremover@v1.0.0
+RUN go install github.com/tq-systems/public-go-utils/cmd/omitemptyremover@v1.3.0
 RUN go install github.com/tq-systems/em-go-licenses@v1.0.1-tq
-RUN go install github.com/CycloneDX/cyclonedx-gomod/cmd/cyclonedx-gomod@v1.9.0
+RUN go install github.com/CycloneDX/cyclonedx-gomod/cmd/cyclonedx-gomod@v1.10.0
 
 # Add golangci-lint default config to home dir, since golangci-lint v2 is not
 # as configurable as v1 via command line
