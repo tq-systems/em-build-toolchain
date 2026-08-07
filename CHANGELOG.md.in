@@ -11,3 +11,7 @@
   set SERVICE_USER=root to keep root
 - package and bundle filenames use a stable latest token in snapshot pipelines; local and tag builds
   keep the version-bearing name and the latest symlink
+- deps no longer builds the source archive, so the archive is only built where it is published;
+  call the archive target to get it
+- build jobs take the fetched dependencies from the CI cache; only pipelines that publish the
+  source archive build from it

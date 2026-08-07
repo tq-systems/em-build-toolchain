@@ -1,3 +1,5 @@
+# The source archive is only published from tag and default branch pipelines, so only those build
+# it; every other pipeline prepares the sources without packing the tarball.
 .prepare-app-build:
   stage: prepare
   extends:
@@ -11,16 +13,30 @@
     # Set CACHEDIR.TAG (see https://bford.info/cachedir/), so tar --exclude-caches-all in archive skips the dir
     - >-
       printf 'Signature: 8a477f597d28d172789f06886806bc55\n' > "${GOMODCACHE}/CACHEDIR.TAG"
+  variables:
+    MAKE_TARGET: deps
   script:
-    - make deps
+    - make ${MAKE_TARGET}
+  rules:
+    - if: $CI_COMMIT_TAG || $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      variables:
+        MAKE_TARGET: archive
+    - when: on_success
 
+# Where the prepare stage built the source archive, the build unpacks it first, so the archive we
+# ship is the one we built from. Everywhere else the dependencies come from the cache.
 .build-aarch64-app:
   stage: build
   extends:
     - .artifacts-always-one-week
     - .image-aarch64
     - .gitlab-runner-tag
-  before_script:
-    - make deps-extract
+  variables:
+    MAKE_TARGET: all
   script:
-    - make all
+    - make ${MAKE_TARGET}
+  rules:
+    - if: $CI_COMMIT_TAG || $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      variables:
+        MAKE_TARGET: deps-extract all
+    - when: on_success
