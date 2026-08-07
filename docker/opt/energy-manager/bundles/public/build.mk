@@ -13,6 +13,9 @@ RAUC_KEYRING  ?= ${RAUC_CERT}
 BUNDLE_BUILD_NAME ?= ${DEVEL_BUNDLE_NAME}
 
 BUNDLE_FILE_SUFFIX = raucb
+# The bundle filename carries this token. Snapshot pipelines use the stable 'latest' so a branch
+# folder always has one reachable bundle, while the real version stays in the rauc manifest.
+BUNDLE_FILE_VERSION ?= $(if ${TQEM_SNAPSHOT_BUILD},latest,sw${VERSION})
 
 EMIT_BASE_BUILD_ARGS = \
 	--machine ${MACHINE} \
@@ -26,7 +29,7 @@ EMIT_BASE_BUILD_ARGS = \
 	--core-image ${FILE_CORE_IMAGE} \
 	--image-name ${DEVEL_BUNDLE_NAME} \
 	--bundle-version ${VERSION} \
-	--output-bundle ${TQEM_DEPLOY_PATH}/${BUNDLE_FILE}
+	--output-bundle ${TQEM_DEPLOY_BIN_PATH}/${BUNDLE_FILE}
 
 # TBD: Fix caching with emit
 # $(if ${TQEM_APPS_CACHE_PATH},--download-dir '${TQEM_APPS_CACHE_PATH}')
@@ -69,7 +72,9 @@ emit-build: ${APP_DOWNLOAD_DIR}
 
 	$(eval FILE_CORE_IMAGE = /opt/energy-manager/emit/${MACHINE}/em-image-core-${MACHINE}.tar)
 	$(eval BUNDLE_PREFIX  = ${BUNDLE_BUILD_NAME}-${DEVICE_TYPE})
-	$(eval BUNDLE_FILE    = ${BUNDLE_PREFIX}-sw${VERSION}.${BUNDLE_FILE_SUFFIX})
+	$(eval BUNDLE_FILE    = ${BUNDLE_PREFIX}-${BUNDLE_FILE_VERSION}.${BUNDLE_FILE_SUFFIX})
+
+	mkdir -p ${TQEM_DEPLOY_BIN_PATH}
 
 	$(eval EMIT_BUILD_ARGS = $(EMIT_BASE_BUILD_ARGS) $(MIGRATION_ARGS) $(FIREWALL_ARGS))
 

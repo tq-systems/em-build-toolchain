@@ -17,7 +17,7 @@ ${DIR_BACKEND_VENDOR}:
 
 go-deps-extract:
 	rm -rf ./${DIR_BACKEND_REL}/vendor \
-		&& tar xzf ${TQEM_DEPLOY_PATH}/${BUILD_ARCHIVE} ./${DIR_BACKEND_REL}/vendor
+		&& tar xzf ${TQEM_DEPLOY_SRC_PATH}/${BUILD_ARCHIVE} ./${DIR_BACKEND_REL}/vendor
 
 go-build: ${DIR_BACKEND_VENDOR}
 	cd ${DIR_BACKEND} && go build -mod=vendor ${ADD_GO_BUILD_FLAGS} \

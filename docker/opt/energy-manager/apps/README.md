@@ -88,6 +88,11 @@ This Makefile provides the Energy Manager package build (*.empkg).
 | SERVICE_EXTRA_SERVICE | (empty)                        | Extend default service in systemd service file |
 | SERVICE_CONTENT       | (Collection of default values) | Entire content of systemd service file         |
 
+A local build names the package after its version and adds a `_latest_` symlink next to it. A
+snapshot pipeline overwrites its target folder in place, so there the package is named `_latest_`
+directly and no symlink is created. Tag builds always carry the version. Nothing has to be set for
+this, the toolchain derives it from TQEM_CI and TQEM_GIT_TAG.
+
 ## App user privileges
 The most important aspect of app sandboxing is not granting root privileges. The toolchain will
 configure apps to be run as separate app-user in their respective namespaces. The following line

@@ -15,4 +15,9 @@ deploy-release:
 	$(eval TQEM_BUILD_TYPE_DIRNAME = ${TQEM_RELEASES_DIRNAME})
 	tqem-copy-safe.sh ${TQEM_DEPLOY_SOURCE_PATH} ${TQEM_DEPLOY_DESTINATION_PATH}
 
-.PHONY: deploy-snapshot deploy-release
+# Same immutable copy as deploy-release, but into the release-candidates tree.
+deploy-rc:
+	$(eval TQEM_BUILD_TYPE_DIRNAME = ${TQEM_RCS_DIRNAME})
+	tqem-copy-safe.sh ${TQEM_DEPLOY_SOURCE_PATH} ${TQEM_DEPLOY_DESTINATION_PATH}
+
+.PHONY: deploy-snapshot deploy-release deploy-rc
