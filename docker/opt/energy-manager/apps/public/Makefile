@@ -101,15 +101,20 @@ endif
 # This needs to be included after setting build and service variables
 include /opt/energy-manager/apps/public/package.mk
 
-archive: prepare
+# Complete source tree: fetched dependencies plus the submodule sources.
+deps: prepare
 	git -C ${TQEM_PROJECT_ROOT_PATH} submodule update --init --recursive
+
+# The source archive is only needed where it is published, so it is no longer part of deps.
+archive: deps
 	mkdir -p ${TQEM_DEPLOY_SRC_PATH}
 	tar czf ${TQEM_DEPLOY_SRC_PATH}/${BUILD_ARCHIVE} -C ${TQEM_PROJECT_ROOT_PATH} \
 		--exclude=artifacts --exclude=deploy --exclude=frontend/container \
 		--exclude=cache --exclude-caches-all --exclude-vcs .
 
-deps: archive
-
+# Unpacks the source archive built by an earlier stage, so the build works from the sources we
+# ship. Only call it where that archive exists; everywhere else the dependencies come from the
+# cache and the build targets fetch them themselves if it is cold.
 deps-extract: frontend-deps-extract backend-deps-extract
 
 upgrade-deps: backend-upgrade frontend-upgrade

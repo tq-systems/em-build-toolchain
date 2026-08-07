@@ -55,28 +55,11 @@ by the toolchain and described below.
 | ESSENTIAL             | 0                         | Essential apps cannot be uninstalled |
 | AUTOSTART             | 1                         | Automatically start of app           |
 
-## backend-cmake.mk
-This Makefile provides the C/C++ backend build.
-
 ## backend-go-mod.mk
 This Makefile provides the Go (Golang) backend build.
 
-## deploy.mk
-This Makefile provides the app deployment. The variables DEPLOY_SERVER and DEPLOY_DIR
-need to be set via make command or environment.
-
-| Key                   | Default value | Description                        |
-|-----------------------|---------------|------------------------------------|
-| DEPLOY_IN_VARIANT_DIR | (empty)       | Deploy app in variant subdirectory |
-
-## docs.mk
-This Makefile provides changelog handling.
-
 ## frontend-yarn.mk
 This Makefile provides yarn frontend build.
-
-## integration.mk
-This Makefile provides targets for tests with cypress, robot and shell scripts.
 
 ## package.mk
 This Makefile provides the Energy Manager package build (*.empkg).

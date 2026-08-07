@@ -186,8 +186,8 @@ empkg-profile: empkg-prepare
 
 empkg-data: empkg-service empkg-license empkg-firewall empkg-dbus-conf empkg-manifest empkg-profile
 
-# Variant subfolder inside bin/, set by variant-aware extensions for
-# DEPLOY_IN_VARIANT_DIR builds; empty for the default and for suffix-mode variants.
+# Variant subfolder inside bin/, set by variant-aware extensions for non-default variants;
+# empty for the default variant and for apps without variants.
 PKG_VARIANT_SUBDIR ?=
 # The package filename carries this token. Snapshot pipelines use the stable 'latest' because they
 # overwrite their target folder in place; local and tag builds keep the version-bearing name plus
