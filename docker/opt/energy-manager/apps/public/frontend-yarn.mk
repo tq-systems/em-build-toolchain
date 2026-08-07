@@ -16,7 +16,7 @@ ${DIR_NODE_MODULES}:
 
 yarn-deps-extract:
 	rm -rf ./${DIR_FRONTEND_REL}/node_modules \
-		&& tar xzf ${TQEM_DEPLOY_PATH}/${BUILD_ARCHIVE} ./${DIR_FRONTEND_REL}/node_modules
+		&& tar xzf ${TQEM_DEPLOY_SRC_PATH}/${BUILD_ARCHIVE} ./${DIR_FRONTEND_REL}/node_modules
 
 # We cannot rename 'yarn-release' to 'yarn-build' due to some backwards compatibility issues
 yarn-release: ${DIR_NODE_MODULES}

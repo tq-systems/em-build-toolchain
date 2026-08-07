@@ -103,7 +103,8 @@ include /opt/energy-manager/apps/public/package.mk
 
 archive: prepare
 	git -C ${TQEM_PROJECT_ROOT_PATH} submodule update --init --recursive
-	tar czf ${TQEM_DEPLOY_PATH}/${BUILD_ARCHIVE} -C ${TQEM_PROJECT_ROOT_PATH} \
+	mkdir -p ${TQEM_DEPLOY_SRC_PATH}
+	tar czf ${TQEM_DEPLOY_SRC_PATH}/${BUILD_ARCHIVE} -C ${TQEM_PROJECT_ROOT_PATH} \
 		--exclude=artifacts --exclude=deploy --exclude=frontend/container \
 		--exclude=cache --exclude-caches-all --exclude-vcs .
 

@@ -1,1 +1,13 @@
 ## [{{ version }}]
+### Added
+- docker/README.md: list of the images with their purpose
+- app and bundle producers place artifacts into a bin subfolder of the deploy tree, apps keep a flat
+  compatibility symlink, preparing the unified deployment layout
+- app build archives are placed into the src subfolder of the deploy tree
+- new deploy-rc target deploys immutably into the release-candidates tree
+
+### Changed
+- Breaking changes in package.mk: App services run as an app user instead of root by default,
+  set SERVICE_USER=root to keep root
+- package and bundle filenames use a stable latest token in snapshot pipelines; local and tag builds
+  keep the version-bearing name and the latest symlink

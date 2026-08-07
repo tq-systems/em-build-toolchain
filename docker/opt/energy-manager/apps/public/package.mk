@@ -186,17 +186,36 @@ empkg-profile: empkg-prepare
 
 empkg-data: empkg-service empkg-license empkg-firewall empkg-dbus-conf empkg-manifest empkg-profile
 
+# Variant subfolder inside bin/, set by variant-aware extensions for
+# DEPLOY_IN_VARIANT_DIR builds; empty for the default and for suffix-mode variants.
+PKG_VARIANT_SUBDIR ?=
+# The package filename carries this token. Snapshot pipelines use the stable 'latest' because they
+# overwrite their target folder in place; local and tag builds keep the version-bearing name plus
+# the latest symlink, so the deploy folder still shows which version was built. The real version
+# stays in the manifest either way.
+PKG_FILE_VERSION ?= $(if ${TQEM_SNAPSHOT_BUILD},latest,${VERSION})
 LINK_VERSION ?= latest
 EMPKG_TAR := tar --numeric-owner --owner=0 --group=0
 
 empkg-build: empkg-data
-	$(eval PKG_FILE = ${APP_ID}${APP_ID_SUFFIX}_${VERSION}_${PKG_ARCH}.${APP_FILE_SUFFIX})
-	$(eval PKG_LINK = ${APP_ID}${APP_ID_SUFFIX}_${LINK_VERSION}_${PKG_ARCH}.${APP_FILE_SUFFIX})
+	$(eval PKG_FILE = ${APP_ID}${APP_ID_SUFFIX}_${PKG_FILE_VERSION}_${PKG_ARCH}.${APP_FILE_SUFFIX})
+	$(eval PKG_BIN_DIR = ${TQEM_DEPLOY_BIN_PATH}/${PKG_VARIANT_SUBDIR})
 
+	mkdir -p ${PKG_BIN_DIR}
 	$(EMPKG_TAR) -cJf ${DIR_PKG_ARCHIVE}/data.tar.xz -C ${DIR_PKG_ROOT_APP} .
-	$(EMPKG_TAR) -cf ${TQEM_DEPLOY_PATH}/${PKG_FILE} -C ${DIR_PKG_ARCHIVE} manifest.json data.tar.xz
-	test "${PKG_FILE}" = "${PKG_LINK}" || ln -sf ${PKG_FILE} ${TQEM_DEPLOY_PATH}/${PKG_LINK}
-	sha256sum ${TQEM_DEPLOY_PATH}/${PKG_FILE} | awk '{ print $$1 }' > ${TQEM_DEPLOY_PATH}/${PKG_FILE}.sha256
+	$(EMPKG_TAR) -cf ${PKG_BIN_DIR}/${PKG_FILE} -C ${DIR_PKG_ARCHIVE} manifest.json data.tar.xz
+	sha256sum ${PKG_BIN_DIR}/${PKG_FILE} | awk '{ print $$1 }' > ${PKG_BIN_DIR}/${PKG_FILE}.sha256
+
+# Only local builds get the symlink; in a pipeline the folder holds exactly one artifact anyway.
+ifneq (${TQEM_CI},true)
+	$(eval PKG_LINK = ${APP_ID}${APP_ID_SUFFIX}_${LINK_VERSION}_${PKG_ARCH}.${APP_FILE_SUFFIX})
+	test '${PKG_FILE}' = '${PKG_LINK}' || ln -sf ${PKG_FILE} ${PKG_BIN_DIR}/${PKG_LINK}
+endif
+
+	# LEGACY (remove with next major): flat compat symlinks so consumers of the old flat layout
+	# (emit URLs without /bin, app-sdk deploy/*.empkg globs) keep working during the 1-major window.
+	ln -sf ${TQEM_BIN_DIRNAME}/${PKG_VARIANT_SUBDIR}${PKG_FILE} ${TQEM_DEPLOY_PATH}/${PKG_FILE}
+	ln -sf ${TQEM_BIN_DIRNAME}/${PKG_VARIANT_SUBDIR}${PKG_FILE}.sha256 ${TQEM_DEPLOY_PATH}/${PKG_FILE}.sha256
 
 EMPKG_PREREQS = empkg-build
 
