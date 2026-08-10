@@ -1,11 +1,13 @@
 ## [{{ version }}]
 ### Added
-- common image now exports PUBLIC_TOOLCHAIN_DOCKER_TAG as an ENV variable so the image version is
-  readable from inside a running container; amd64 and aarch64 inherit this via their common base
+- common: Install TQ shell library (removed from base/ubuntu image)
 
 ### Changed
-- base-stable: teridian-fw merged into teridiand
-- ci/common/base.yml: base ref to version 3.1.4
+- stable base apps: teridian-fw merged into teridiand
+- Update base reference to v4.0.0
+- common/amd64: Minor/Patch Updates
+- Due to a minor update to gomock, the Go mocks need to be recreated
+- A minor update to Yarn requires changes to yarn.lock and .yarnrc.yml
 
-### Fixed
-- Prevent overriding the VERSION.txt file during emit-build
+### Removed
+- amd64: Removed obsolete gitleaks

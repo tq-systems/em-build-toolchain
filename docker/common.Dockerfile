@@ -34,7 +34,7 @@ RUN apt-get update && apt-get -y upgrade && apt-get install -y \
 	unzip
 
 # Install a fixed node version
-ARG NODE_VERSION=22.13.1
+ARG NODE_VERSION=22.23.2
 RUN apt-get install -y nodejs=${NODE_VERSION}-1nodesource1 && apt-mark hold nodejs
 
 # prepare working directory
@@ -44,14 +44,14 @@ RUN mkdir /workspace && chown -R ${DOCKER_USER}:${DOCKER_USER} /workspace
 WORKDIR /workspace
 
 # Install a fixed yarn version directly, without corepack
-ARG YARN_VERSION=4.6.0
+ARG YARN_VERSION=4.18.0
 ENV YARN_ENABLE_TELEMETRY=0
 RUN curl -fsSL https://repo.yarnpkg.com/${YARN_VERSION}/packages/yarnpkg-cli/bin/yarn.js \
-    -o /usr/local/lib/yarn.cjs && \
-    printf '#!/bin/sh\nexec node /usr/local/lib/yarn.cjs "$@"\n' \
-    > /usr/local/bin/yarn && \
-    chmod +x /usr/local/bin/yarn && \
-    npm uninstall -g corepack
+	-o /usr/local/lib/yarn.cjs && \
+	printf '#!/bin/sh\nexec node /usr/local/lib/yarn.cjs "$@"\n' \
+	> /usr/local/bin/yarn && \
+	chmod +x /usr/local/bin/yarn && \
+	npm uninstall -g corepack
 
 # Set locales
 ENV LC_ALL=C.UTF-8
@@ -72,13 +72,19 @@ ENV PATH=/opt/venv/bin:/home/${DOCKER_USER}/.local/bin:$PATH
 RUN printf "tqemci ALL=(ALL) NOPASSWD:ALL\n" >> /etc/sudoers
 
 RUN python3 -m venv /opt/venv \
-	&& pip install python-gitlab==8.2.0 pyyaml==6.0.1
+	&& pip install python-gitlab==8.5.0 pyyaml==6.0.3
 
 # Enable to use the scripts in further images
 COPY ./scripts/*.sh /usr/local/bin/
 
 # Enable to use the local usr dir in further images
 COPY ./docker/usr/local/ /usr/local/
+
+# install the TQ-EM shell library
+ENV LIB_SHELL_VERSION=2.0.0
+RUN git clone https://github.com/tq-systems/em-lib-shell /tmp/libshell \
+	&& git -C /tmp/libshell checkout v${LIB_SHELL_VERSION} \
+	&& make -C /tmp/libshell install && rm -rf /tmp/libshell
 
 # Placed last so a changing BUILD_TAG does not invalidate the cache of the
 # expensive layers above
