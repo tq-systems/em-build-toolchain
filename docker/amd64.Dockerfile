@@ -32,7 +32,7 @@ RUN apt-get update && apt-get -y upgrade \
 && apt-get autoremove --yes && apt-get clean --yes
 
 ARG GO_VERSION=1.26.5
-RUN wget -c -nv --no-check-certificate https://go.dev./dl/go${GO_VERSION}.linux-amd64.tar.gz -O - \
+RUN wget -c -nv https://go.dev./dl/go${GO_VERSION}.linux-amd64.tar.gz -O - \
 	| tar -xz -C /usr/local
 
 RUN pip install \
