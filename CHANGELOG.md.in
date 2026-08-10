@@ -1,13 +1,1 @@
 ## [{{ version }}]
-### Added
-- common: Install TQ shell library (removed from base/ubuntu image)
-
-### Changed
-- stable base apps: teridian-fw merged into teridiand
-- Update base reference to v4.0.0
-- common/amd64: Minor/Patch Updates
-- Due to a minor update to gomock, the Go mocks need to be recreated
-- A minor update to Yarn requires changes to yarn.lock and .yarnrc.yml
-
-### Removed
-- amd64: Removed obsolete gitleaks
