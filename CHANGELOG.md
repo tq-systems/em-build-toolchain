@@ -1,3 +1,7 @@
+## [3.0.1] - 2026-08-17
+### Changed
+- em-build: update to v9.0.7
+
 ## [3.0.0] - 2026-08-10
 ### Added
 - common: Install TQ shell library (removed from base/ubuntu image)
