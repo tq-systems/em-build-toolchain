@@ -1,3 +1,7 @@
+## [2.0.11] - 2026-08-25
+### Changed
+- em-build: update to v9.0.7
+
 ## [2.0.10] - 2026-07-13
 ### Changed
 - em-build: update to v9.0.5
