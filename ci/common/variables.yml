@@ -1,4 +1,5 @@
 variables:
+  YARN_ENABLE_GLOBAL_CACHE: 'false' # keep the yarn store inside the project so it can be cached
   TQEM_GIT_REFERENCE: ${CI_COMMIT_REF_NAME} # branch or tag
   TQEM_DEPLOYMENT_SUBDIR: ${CI_COMMIT_REF_NAME}
   TQEM_PROJECT_URL: ${CI_PROJECT_URL}
