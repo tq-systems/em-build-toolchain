@@ -12,10 +12,33 @@ stages:
   - test
   - deploy
 
+# Cache the yarn store instead of frontend/node_modules: a cached tree survives the removal of a
+# package and hides the error. YARN_ENABLE_GLOBAL_CACHE keeps the store inside the project.
+.cache-yarn-store: &cache-yarn-store
+  key:
+    prefix: yarn-store
+    files:
+      - frontend/yarn.lock
+  paths:
+    - frontend/.yarn/cache
+
+.cache-vendor: &cache-vendor
+  key: ${CI_COMMIT_REF_NAME}
+  paths:
+    - backend/vendor/
+
+# Read-only, because the slots are shared with pipelines running in parallel. Only a job that
+# regenerates the dependencies may write them, see .cache-policy-pull-push.
 default:
   cache:
-    key: ${CI_COMMIT_REF_NAME}
-    paths:
-      - backend/vendor/
-      - frontend/node_modules/
-      - cache/
+    - <<: *cache-yarn-store
+      policy: pull
+    - <<: *cache-vendor
+      policy: pull
+
+.cache-policy-pull-push:
+  cache:
+    - <<: *cache-yarn-store
+      policy: pull-push
+    - <<: *cache-vendor
+      policy: pull-push

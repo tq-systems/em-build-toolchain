@@ -3,6 +3,8 @@
 - common: Install TQ shell library (removed from base/ubuntu image)
 
 ### Changed
+- apps: Cache the yarn package store instead of frontend/node_modules
+- apps: Write the CI cache only in the prepare job
 - stable base apps: teridian-fw merged into teridiand
 - Update base reference to v4.0.0
 - common/amd64: Minor/Patch Updates
