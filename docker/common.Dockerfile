@@ -86,6 +86,12 @@ RUN git clone https://github.com/tq-systems/em-lib-shell /tmp/libshell \
 	&& git -C /tmp/libshell checkout v${LIB_SHELL_VERSION} \
 	&& make -C /tmp/libshell install && rm -rf /tmp/libshell
 
+# Hand-installed tools carry no package metadata, so their versions are exposed as
+# labels and can be read back from the built image
+LABEL tqem.tool.node="${NODE_VERSION}" \
+	tqem.tool.yarn="${YARN_VERSION}" \
+	tqem.tool.lib-shell="${LIB_SHELL_VERSION}"
+
 # Placed last so a changing BUILD_TAG does not invalidate the cache of the
 # expensive layers above
 ARG BUILD_TAG=latest
