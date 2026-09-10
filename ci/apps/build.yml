@@ -2,6 +2,7 @@
   stage: prepare
   extends:
     - .artifacts-always-one-day
+    - .cache-policy-pull-push
     - .image-aarch64
     - .gitlab-runner-tag
   script:
