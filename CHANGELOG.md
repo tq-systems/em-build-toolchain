@@ -1,3 +1,9 @@
+## [3.1.0] - 2026-09-14
+### Changed
+- apps: Cache the yarn package store instead of frontend/node_modules
+- apps: Write the CI cache only in the prepare job
+- ci: bump base CI ref to v4.0.1
+
 ## [3.0.1] - 2026-08-17
 ### Changed
 - em-build: update to v9.0.7
