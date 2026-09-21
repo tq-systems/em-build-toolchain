@@ -10,6 +10,7 @@
 - common/amd64: Minor/Patch Updates
 - Due to a minor update to gomock, the Go mocks need to be recreated
 - A minor update to Yarn requires changes to yarn.lock and .yarnrc.yml
+- common/amd64: versions of the hand-installed tools are exposed as image labels
 
 ### Removed
 - amd64: Removed obsolete gitleaks

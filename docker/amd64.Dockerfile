@@ -86,4 +86,10 @@ COPY ./docker/opt/ /opt/
 
 USER ${DOCKER_USER}
 
+# Hand-installed tools carry no package metadata, so their versions are exposed as
+# labels and can be read back from the built image
+LABEL tqem.tool.go="${GO_VERSION}" \
+	tqem.tool.protobuf="${PB_VERSION}" \
+	tqem.tool.libdeviceinfo="${LIBDEVICEINFO_VERSION}"
+
 ENTRYPOINT ["sh", "-c", "exec \"$@\"", "-"]
