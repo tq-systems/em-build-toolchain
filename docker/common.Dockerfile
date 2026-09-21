@@ -81,7 +81,7 @@ COPY ./scripts/*.sh /usr/local/bin/
 COPY ./docker/usr/local/ /usr/local/
 
 # install the TQ-EM shell library
-ENV LIB_SHELL_VERSION=2.0.0
+ENV LIB_SHELL_VERSION=2.1.1
 RUN git clone https://github.com/tq-systems/em-lib-shell /tmp/libshell \
 	&& git -C /tmp/libshell checkout v${LIB_SHELL_VERSION} \
 	&& make -C /tmp/libshell install && rm -rf /tmp/libshell
