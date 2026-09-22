@@ -3,7 +3,12 @@
 - common: Install and update TQ shell library (removed from base/ubuntu image)
 
 ### Changed
+- common: Set GOPROXY so that go falls back to direct on any proxy error
+- ci: Retry the image build jobs up to two times, so a dropped connection to the Go module proxy
+  no longer turns the pipeline red
 - apps: Cache the yarn package store instead of frontend/node_modules
+- apps: Cache the Go module zips, keyed by backend/go.sum, so go mod vendor runs without the
+  network on a branch with unchanged dependencies
 - apps: Write the CI cache only in the prepare job
 - stable base apps: teridian-fw merged into teridiand
 - Update base reference to v4.0.0

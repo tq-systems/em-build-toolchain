@@ -27,6 +27,21 @@ stages:
   paths:
     - backend/vendor/
 
+# Only the zips, keyed by go.sum: a branch with unchanged dependencies vendors without the network.
+.cache-gomod: &cache-gomod
+  key:
+    prefix: gomod
+    files:
+      - backend/go.sum
+  paths:
+    - .gomodcache/cache/download
+
+# Stable cache, so the first run after a go.sum change starts warm.
+.cache-gomod-fallback: &cache-gomod-fallback
+  key: gomod-fallback
+  paths:
+    - .gomodcache/cache/download
+
 # Read-only, because the slots are shared with pipelines running in parallel. Only a job that
 # regenerates the dependencies may write them, see .cache-policy-pull-push.
 default:
@@ -35,10 +50,18 @@ default:
       policy: pull
     - <<: *cache-vendor
       policy: pull
+    - <<: *cache-gomod
+      policy: pull
+    - <<: *cache-gomod-fallback
+      policy: pull
 
 .cache-policy-pull-push:
   cache:
     - <<: *cache-yarn-store
       policy: pull-push
     - <<: *cache-vendor
+      policy: pull-push
+    - <<: *cache-gomod
+      policy: pull-push
+    - <<: *cache-gomod-fallback
       policy: pull-push

@@ -9,6 +9,12 @@ stages:
   - trigger-app
   - trigger-bundle
 
+# Go module downloads drop now and then and a rerun succeeds; a broken build repeats as well.
+.retry-network:
+  retry:
+    max: 2
+    when: script_failure
+
 Shell Linter:
   extends:
     - .lint-shell
@@ -17,6 +23,7 @@ Shell Linter:
 Test All Builds:
   extends:
     - .docker-build
+    - .retry-network
   stage: test
   variables:
     BUILD_TAG: 'test-next'
@@ -54,6 +61,7 @@ common Image:
   extends:
     - .docker-build
     - .rule-release-images
+    - .retry-network
   stage: common
   script:
     - make release IMAGE=common
@@ -62,6 +70,7 @@ amd64 Image:
   extends:
     - .docker-build
     - .rule-release-images
+    - .retry-network
   stage: amd64
   script:
     - make release IMAGE=amd64
@@ -70,6 +79,7 @@ Other Images:
   extends:
     - .docker-build
     - .rule-release-images
+    - .retry-network
   stage: otherimages
   parallel:
     matrix:

@@ -5,6 +5,12 @@
     - .cache-policy-pull-push
     - .image-aarch64
     - .gitlab-runner-tag
+  before_script:
+    - test -n "${GOMODCACHE}"
+    - mkdir -p "${GOMODCACHE}"
+    # Set CACHEDIR.TAG (see https://bford.info/cachedir/), so tar --exclude-caches-all in archive skips the dir
+    - >-
+      printf 'Signature: 8a477f597d28d172789f06886806bc55\n' > "${GOMODCACHE}/CACHEDIR.TAG"
   script:
     - make deps
 

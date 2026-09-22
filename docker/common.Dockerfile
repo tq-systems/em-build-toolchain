@@ -62,6 +62,8 @@ ENV LANGUAGE=C.UTF-8
 ENV GOPATH=/workspace/go
 ENV PATH=/usr/local/go/bin:$PATH:$GOPATH/bin
 ENV GO111MODULE=on
+# Pipe instead of comma: go falls back to direct on any proxy error, not only on a missing module.
+ENV GOPROXY=https://proxy.golang.org|direct
 ARG GOPRIVATE
 ENV GOPRIVATE=${GOPRIVATE}
 
