@@ -1,6 +1,6 @@
 ## [{{ version }}]
 ### Added
-- common: Install TQ shell library (removed from base/ubuntu image)
+- common: Install and update TQ shell library (removed from base/ubuntu image)
 
 ### Changed
 - apps: Cache the yarn package store instead of frontend/node_modules
