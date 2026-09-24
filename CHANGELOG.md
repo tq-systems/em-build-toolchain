@@ -1,3 +1,7 @@
+## [3.1.1] - 2026-09-24
+### Changed
+- em-build: update to v9.0.8
+
 ## [3.1.0] - 2026-09-14
 ### Changed
 - apps: Cache the yarn package store instead of frontend/node_modules
