@@ -1,5 +1,7 @@
 variables:
   YARN_ENABLE_GLOBAL_CACHE: 'false' # keep the yarn store inside the project so it can be cached
+  # Inside the project so it can be cached, but outside CYPRESS_CACHE_FOLDER whose entry is cache/
+  GOMODCACHE: ${CI_PROJECT_DIR}/.gomodcache
   TQEM_GIT_REFERENCE: ${CI_COMMIT_REF_NAME} # branch or tag
   TQEM_DEPLOYMENT_SUBDIR: ${CI_COMMIT_REF_NAME}
   TQEM_PROJECT_URL: ${CI_PROJECT_URL}
