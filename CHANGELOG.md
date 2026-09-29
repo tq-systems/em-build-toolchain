@@ -1,3 +1,14 @@
+## [3.2.0] - 2026-09-29
+### Changed
+- common: Set GOPROXY so that go falls back to direct on any proxy error
+- ci: Retry the image build jobs up to two times, so a dropped connection to the Go module proxy
+  no longer turns the pipeline red
+- apps: Cache the Go module zips, keyed by backend/go.sum, so go mod vendor runs without the
+  network on a branch with unchanged dependencies
+- common: Update TQ shell library to 2.1.1
+- common/amd64: versions of the hand-installed tools are exposed as image labels
+- ci: bump base CI ref to v4.0.2
+
 ## [3.1.1] - 2026-09-24
 ### Changed
 - em-build: update to v9.0.8
