@@ -15,3 +15,4 @@
   call the archive target to get it
 - build jobs take the fetched dependencies from the CI cache; only pipelines that publish the
   source archive build from it
+- the source archive of a snapshot pipeline is named <app>_latest.tar.gz, like the package
