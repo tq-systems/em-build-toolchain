@@ -1,1 +1,3 @@
 ## [{{ version }}]
+### Fixed
+- common: TQ shell library back to 2.0.0, bundle builds no longer ask for the eg4xx bootloader
