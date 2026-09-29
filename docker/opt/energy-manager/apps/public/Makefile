@@ -44,7 +44,9 @@ SERVICE_BUILD  ?= $(if $(BACKEND_BUILD),1,0)
 
 PKG_ARCH ?= aarch64
 
-BUILD_ARCHIVE = ${APP_ID}_${VERSION}.tar.gz
+# Same naming rule as the package: a snapshot overwrites its src folder, so consumers such as the
+# integration tests fetch the archive under the stable name <app>_latest.tar.gz.
+BUILD_ARCHIVE = ${APP_ID}_$(if ${TQEM_SNAPSHOT_BUILD},latest,${VERSION}).tar.gz
 
 # First target = default target
 all: empkg
