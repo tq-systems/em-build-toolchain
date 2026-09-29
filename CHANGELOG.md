@@ -1,3 +1,7 @@
+## [3.2.1] - 2026-09-29
+### Fixed
+- common: TQ shell library back to 2.0.0, bundle builds no longer ask for the eg4xx bootloader
+
 ## [3.2.0] - 2026-09-29
 ### Changed
 - common: Set GOPROXY so that go falls back to direct on any proxy error
