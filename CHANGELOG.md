@@ -1,3 +1,7 @@
+## [3.2.2] - 2026-10-05
+### Added
+- common: Install and update TQ shell library (removed from base/ubuntu image)
+
 ## [3.2.1] - 2026-09-29
 ### Fixed
 - common: TQ shell library back to 2.0.0, bundle builds no longer ask for the eg4xx bootloader
