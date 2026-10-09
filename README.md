@@ -12,6 +12,10 @@ This project is licensed under the TQSPSLA-1.0.3 license, see LICENSE file for f
 All files in this project are classified as product-specific software and bound
 to the use with the TQ-Systems GmbH product: EM400
 
+## Images
+The public toolchain provides the images `common`, `amd64` and `aarch64`.
+Their purpose is described in [docker/README.md](docker/README.md).
+
 ## Development
 ### Pull images
 Pull all images from registry:

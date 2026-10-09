@@ -1,6 +1,7 @@
 ## [{{ version }}]
 ### Added
 - common: Install and update TQ shell library (removed from base/ubuntu image)
+- docker/README.md: list of the images with their purpose
 
 ### Changed
 - common: Set GOPROXY so that go falls back to direct on any proxy error
