@@ -32,7 +32,7 @@ Build a specific image:
 ```bash
 $ make common
 $ make amd64
-$ make armel
+$ make aarch64
 $ ...
 ```
 By default the current snapshots of the core images and the cross-compiler
