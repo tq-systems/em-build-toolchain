@@ -1,3 +1,54 @@
+## [3.2.2] - 2026-10-05
+### Added
+- common: Install and update TQ shell library (removed from base/ubuntu image)
+
+## [3.2.1] - 2026-09-29
+### Fixed
+- common: TQ shell library back to 2.0.0, bundle builds no longer ask for the eg4xx bootloader
+
+## [3.2.0] - 2026-09-29
+### Changed
+- common: Set GOPROXY so that go falls back to direct on any proxy error
+- ci: Retry the image build jobs up to two times, so a dropped connection to the Go module proxy
+  no longer turns the pipeline red
+- apps: Cache the Go module zips, keyed by backend/go.sum, so go mod vendor runs without the
+  network on a branch with unchanged dependencies
+- common: Update TQ shell library to 2.1.1
+- common/amd64: versions of the hand-installed tools are exposed as image labels
+- ci: bump base CI ref to v4.0.2
+
+## [3.1.1] - 2026-09-24
+### Changed
+- em-build: update to v9.0.8
+
+## [3.1.0] - 2026-09-14
+### Changed
+- apps: Cache the yarn package store instead of frontend/node_modules
+- apps: Write the CI cache only in the prepare job
+- ci: bump base CI ref to v4.0.1
+
+## [2.0.11] - 2026-08-25
+### Changed
+- em-build: update to v9.0.7
+
+## [3.0.1] - 2026-08-17
+### Changed
+- em-build: update to v9.0.7
+
+## [3.0.0] - 2026-08-10
+### Added
+- common: Install TQ shell library (removed from base/ubuntu image)
+
+### Changed
+- stable base apps: teridian-fw merged into teridiand
+- Update base reference to v4.0.0
+- common/amd64: Minor/Patch Updates
+- Due to a minor update to gomock, the Go mocks need to be recreated
+- A minor update to Yarn requires changes to yarn.lock and .yarnrc.yml
+
+### Removed
+- amd64: Removed obsolete gitleaks
+
 ## [2.0.10] - 2026-07-13
 ### Changed
 - em-build: update to v9.0.5
