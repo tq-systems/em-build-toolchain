@@ -5,6 +5,7 @@ APP_FILE_SUFFIX = empkg
 # Extends the app ID for the empkg file (e.g. for variants)
 APP_ID_SUFFIX ?=
 
+SERVICE_USER            ?= ${APP_NAME}
 SERVICE_WORKING_DIR     = /cfglog/apps/${APP_ID}
 SERVICE_RUN_APP_DIR     ?= ${APP_ID}
 SERVICE_RUN_DIR         = /run/em/apps/${SERVICE_RUN_APP_DIR}
@@ -25,6 +26,7 @@ ${SERVICE_EXTRA_UNIT}
 
 [Service]
 ExecStart=${SERVICE_START}
+User=${SERVICE_USER}
 Restart=always
 RestartSec=3
 RestartSteps=5

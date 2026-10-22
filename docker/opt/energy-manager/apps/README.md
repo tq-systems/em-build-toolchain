@@ -83,9 +83,31 @@ This Makefile provides the Energy Manager package build (*.empkg).
 
 | Key                   | Default value                  | Description                                    |
 |-----------------------|--------------------------------|------------------------------------------------|
+| SERVICE_USER          | ${APP_NAME}                    | Set User in systemd service file               |
 | SERVICE_EXTRA_UNIT    | (empty)                        | Extend default unit in systemd service file    |
 | SERVICE_EXTRA_SERVICE | (empty)                        | Extend default service in systemd service file |
 | SERVICE_CONTENT       | (Collection of default values) | Entire content of systemd service file         |
+
+## App user privileges
+The most important aspect of app sandboxing is not granting root privileges. The toolchain will
+configure apps to be run as separate app-user in their respective namespaces. The following line
+will be added to the systemd service file:
+```
+User=${SERVICE_USER}
+```
+
+If additional permissions are required, they can be set using Linux group permissions. To do this, the following
+entry is required in the app's Makefile:
+```
+define SERVICE_EXTRA_SERVICE
+SupplementaryGroups=my-group
+endef
+```
+
+Apps that require root privileges to be functioning correctly should add to their Makefile:
+```
+SERVICE_USER=root
+```
 
 ## Path permissions
 
