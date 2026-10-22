@@ -1,3 +1,11 @@
+## [4.0.0] - 2026-10-22
+### Added
+- docker/README.md: list of the images with their purpose
+
+### Changed
+- Breaking changes in package.mk: App services run as an app user instead of root by default,
+  set SERVICE_USER=root to keep root
+
 ## [3.2.2] - 2026-10-05
 ### Added
 - common: Install and update TQ shell library (removed from base/ubuntu image)
