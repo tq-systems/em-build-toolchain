@@ -5,3 +5,4 @@
 ### Changed
 - Breaking changes in package.mk: App services run as an app user instead of root by default,
   set SERVICE_USER=root to keep root
+- docker/amd64: update Go and golangci-lint

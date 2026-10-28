@@ -31,7 +31,7 @@ RUN apt-get update && apt-get -y upgrade \
 	python3-absl \
 && apt-get autoremove --yes && apt-get clean --yes
 
-ARG GO_VERSION=1.26.5
+ARG GO_VERSION=1.27.3
 RUN wget -c -nv https://go.dev./dl/go${GO_VERSION}.linux-amd64.tar.gz -O - \
 	| tar -xz -C /usr/local
 
@@ -66,7 +66,7 @@ RUN git clone ${PB_URL}.git && cd protobuf && git checkout v${PB_VERSION} \
 	&& sudo make -j$(nproc) && sudo make install && rm -rf /workspace/protobuf && sudo ldconfig
 
 RUN go install go.uber.org/mock/mockgen@v0.6.0
-RUN go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.12.2
+RUN go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.15.0
 RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.36.11
 RUN go install github.com/go-delve/delve/cmd/dlv@v1.27.1
 RUN go install golang.org/x/tools/cmd/godoc@v0.36.0
