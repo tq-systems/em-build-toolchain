@@ -55,28 +55,11 @@ by the toolchain and described below.
 | ESSENTIAL             | 0                         | Essential apps cannot be uninstalled |
 | AUTOSTART             | 1                         | Automatically start of app           |
 
-## backend-cmake.mk
-This Makefile provides the C/C++ backend build.
-
 ## backend-go-mod.mk
 This Makefile provides the Go (Golang) backend build.
 
-## deploy.mk
-This Makefile provides the app deployment. The variables DEPLOY_SERVER and DEPLOY_DIR
-need to be set via make command or environment.
-
-| Key                   | Default value | Description                        |
-|-----------------------|---------------|------------------------------------|
-| DEPLOY_IN_VARIANT_DIR | (empty)       | Deploy app in variant subdirectory |
-
-## docs.mk
-This Makefile provides changelog handling.
-
 ## frontend-yarn.mk
 This Makefile provides yarn frontend build.
-
-## integration.mk
-This Makefile provides targets for tests with cypress, robot and shell scripts.
 
 ## package.mk
 This Makefile provides the Energy Manager package build (*.empkg).
@@ -87,6 +70,11 @@ This Makefile provides the Energy Manager package build (*.empkg).
 | SERVICE_EXTRA_UNIT    | (empty)                        | Extend default unit in systemd service file    |
 | SERVICE_EXTRA_SERVICE | (empty)                        | Extend default service in systemd service file |
 | SERVICE_CONTENT       | (Collection of default values) | Entire content of systemd service file         |
+
+A local build names the package after its version and adds a `_latest_` symlink next to it. A
+snapshot pipeline overwrites its target folder in place, so there the package is named `_latest_`
+directly and no symlink is created. Tag builds always carry the version. Nothing has to be set for
+this, the toolchain derives it from TQEM_CI and TQEM_GIT_TAG.
 
 ## App user privileges
 The most important aspect of app sandboxing is not granting root privileges. The toolchain will

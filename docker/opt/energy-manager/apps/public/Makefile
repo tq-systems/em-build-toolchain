@@ -44,7 +44,9 @@ SERVICE_BUILD  ?= $(if $(BACKEND_BUILD),1,0)
 
 PKG_ARCH ?= aarch64
 
-BUILD_ARCHIVE = ${APP_ID}_${VERSION}.tar.gz
+# Same naming rule as the package: a snapshot overwrites its src folder, so consumers such as the
+# integration tests fetch the archive under the stable name <app>_latest.tar.gz.
+BUILD_ARCHIVE = ${APP_ID}_$(if ${TQEM_SNAPSHOT_BUILD},latest,${VERSION}).tar.gz
 
 # First target = default target
 all: empkg
@@ -101,14 +103,20 @@ endif
 # This needs to be included after setting build and service variables
 include /opt/energy-manager/apps/public/package.mk
 
-archive: prepare
+# Complete source tree: fetched dependencies plus the submodule sources.
+deps: prepare
 	git -C ${TQEM_PROJECT_ROOT_PATH} submodule update --init --recursive
-	tar czf ${TQEM_DEPLOY_PATH}/${BUILD_ARCHIVE} -C ${TQEM_PROJECT_ROOT_PATH} \
+
+# The source archive is only needed where it is published, so it is no longer part of deps.
+archive: deps
+	mkdir -p ${TQEM_DEPLOY_SRC_PATH}
+	tar czf ${TQEM_DEPLOY_SRC_PATH}/${BUILD_ARCHIVE} -C ${TQEM_PROJECT_ROOT_PATH} \
 		--exclude=artifacts --exclude=deploy --exclude=frontend/container \
 		--exclude=cache --exclude-caches-all --exclude-vcs .
 
-deps: archive
-
+# Unpacks the source archive built by an earlier stage, so the build works from the sources we
+# ship. Only call it where that archive exists; everywhere else the dependencies come from the
+# cache and the build targets fetch them themselves if it is cold.
 deps-extract: frontend-deps-extract backend-deps-extract
 
 upgrade-deps: backend-upgrade frontend-upgrade
