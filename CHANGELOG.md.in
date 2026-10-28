@@ -16,3 +16,7 @@
 - build jobs take the fetched dependencies from the CI cache; only pipelines that publish the
   source archive build from it
 - the source archive of a snapshot pipeline is named <app>_latest.tar.gz, like the package
+
+### Fixed
+- version.mk: a tag build takes its version from its own tag, even if the commit carries further
+  tags
