@@ -20,3 +20,5 @@
 ### Fixed
 - version.mk: a tag build takes its version from its own tag, even if the commit carries further
   tags
+- docker/amd64: update Go and golangci-lint
+- docker/common: update nodejs and yarn

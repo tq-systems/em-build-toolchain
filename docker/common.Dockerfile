@@ -34,7 +34,12 @@ RUN apt-get update && apt-get -y upgrade && apt-get install -y \
 	unzip
 
 # Install a fixed node version
-ARG NODE_VERSION=22.23.2
+# To update beyond the package version shipped in current Ubuntu base,
+# we have to add the nodesource repository (via the nodesource setup script)
+# and get their nodejs package.
+ARG NODE_RELEASE=24
+ARG NODE_VERSION=24.22.1
+RUN curl -fsSL https://deb.nodesource.com/setup_${NODE_RELEASE}.x | bash -
 RUN apt-get install -y nodejs=${NODE_VERSION}-1nodesource1 && apt-mark hold nodejs
 
 # prepare working directory
@@ -44,7 +49,7 @@ RUN mkdir /workspace && chown -R ${DOCKER_USER}:${DOCKER_USER} /workspace
 WORKDIR /workspace
 
 # Install a fixed yarn version directly, without corepack
-ARG YARN_VERSION=4.18.0
+ARG YARN_VERSION=4.18.1
 ENV YARN_ENABLE_TELEMETRY=0
 RUN curl -fsSL https://repo.yarnpkg.com/${YARN_VERSION}/packages/yarnpkg-cli/bin/yarn.js \
 	-o /usr/local/lib/yarn.cjs && \
