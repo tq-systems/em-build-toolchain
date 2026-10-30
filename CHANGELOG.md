@@ -1,3 +1,37 @@
+## [5.1.0] - 2026-10-30
+### Changed
+- docker/amd64: update Go and golangci-lint
+- docker/common: update nodejs and yarn
+
+## [5.0.0] - 2026-10-28
+### Added
+- app and bundle producers place artifacts into a bin subfolder of the deploy tree, apps keep a flat
+  compatibility symlink, preparing the unified deployment layout
+- app build archives are placed into the src subfolder of the deploy tree
+- new deploy-rc target deploys immutably into the release-candidates tree
+
+### Changed
+- package and bundle filenames use a stable latest token in snapshot pipelines; local and tag builds
+  keep the version-bearing name and the latest symlink
+- deps no longer builds the source archive, so the archive is only built where it is published;
+  call the archive target to get it
+- build jobs take the fetched dependencies from the CI cache; only pipelines that publish the
+  source archive build from it
+- the source archive of a snapshot pipeline is named <app>_latest.tar.gz, like the package
+- ci: bump base CI ref to v4.0.2
+
+### Fixed
+- version.mk: a tag build takes its version from its own tag, even if the commit carries further
+  tags
+
+## [4.0.0] - 2026-10-22
+### Added
+- docker/README.md: list of the images with their purpose
+
+### Changed
+- Breaking changes in package.mk: App services run as an app user instead of root by default,
+  set SERVICE_USER=root to keep root
+
 ## [3.2.2] - 2026-10-05
 ### Added
 - common: Install and update TQ shell library (removed from base/ubuntu image)
