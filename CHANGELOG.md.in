@@ -7,6 +7,8 @@
 - new deploy-rc target deploys immutably into the release-candidates tree
 - apps/service.mk: all service settings can be set in the app makefile before or after the include;
   settings with an empty value are left out of the service file; new SERVICE_GROUP and SERVICE_RESTART
+- apps/service.mk: RUNTIME_RW_PATHS and RUNTIME_RO_PATHS grant the app access to files that other
+  units create at runtime, RUNTIME_DEPENDS names these units
 
 ### Changed
 - Updated copyright license and file headers

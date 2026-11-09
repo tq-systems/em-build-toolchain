@@ -151,6 +151,45 @@ MANIFEST_RO_PATHS = \
 ```
 
 The toolchain places a JSON-formatted list of all permission requirements in the app manifest.
+The runtime tools grant `rwx` (read/write) or `r-x` (read-only) to these paths and their current contents
+when the app is initialized (installation or boot). Paths that already exist at that time, such as the 'own'
+directories of other apps, are therefore granted via `MANIFEST_RW_PATHS` and `MANIFEST_RO_PATHS`.
+
+Paths that another unit creates only while it is running (e.g. a socket) do not exist at that time and cannot
+be granted via the manifest. For these paths, the app makefile can request access for its service user via
+`RUNTIME_RW_PATHS` and `RUNTIME_RO_PATHS`. The toolchain then adds `SetCredential` / `ExecStartPre` entries to
+the service file, which set the ACL entries (`rwx` or `r-x`, as above) on every service start:
+```
+RUNTIME_RW_PATHS = /run/em/apps/device-settings/example-file
+RUNTIME_RO_PATHS = /run/em/etc/nftables.d/foo.conf
+RUNTIME_DEPENDS = em-app-device-settings.service em-firewall.service
+```
+Several paths or units are separated by spaces. The units that create the files belong in `RUNTIME_DEPENDS`
+(full unit names). They are added as `Requires=` and `After=`, so that this app starts after them. Other
+dependencies, such as `Before=`, can be set directly via `SERVICE_EXTRA_UNIT`.
+
+For an app `foo`, the example above results in these entries in the service file:
+```
+[Unit]
+Requires=em-app-device-settings.service em-firewall.service
+After=em-app-device-settings.service em-firewall.service
+
+[Service]
+SetCredential=tmpfiles.extra:a+ /run/em/apps/device-settings/example-file - - - - u:em-app-foo:rwx,m::rwx\na+ /run/em/etc/nftables.d/foo.conf - - - - u:em-app-foo:r-x,m::rwx\n
+ExecStartPre=+/usr/bin/systemd-tmpfiles --create --prefix=/run/em/apps/device-settings/example-file --prefix=/run/em/etc/nftables.d/foo.conf
+```
+
+How it works:
+- `SetCredential=` hands the service a credential named `tmpfiles.extra`. Its value is a small tmpfiles.d
+  configuration, one line per path. systemd turns each `\n` into a line break.
+- `ExecStartPre=` runs `systemd-tmpfiles` as root (`+`) before the app starts. `systemd-tmpfiles` reads the
+  `tmpfiles.extra` credential like an extra configuration file. The `--prefix` options limit it to the listed
+  paths, so it does not apply the rest of the system's tmpfiles.d configuration.
+- Each line `a+ <path> - - - - u:<user>:<permissions>,m::rwx` adds an ACL entry for the service user and keeps
+  the existing entries (`a+`). `m::rwx` opens the ACL mask, which would otherwise limit the new entry.
+
+A path that does not exist at service start is skipped silently, and the ACL entry is lost when the file is
+recreated later. Without these variables, the service file gets no ACL entries.
 
 ## App classification
 
