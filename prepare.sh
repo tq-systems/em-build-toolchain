@@ -32,6 +32,8 @@ fi
 FILE_AARCH64_TOOLCHAIN="emos-x86_64-aarch64-toolchain$VERSION.sh"
 FILE_EM_AARCH64_BOOTLOADER="em-image-core-em-aarch64$VERSION.bootloader.tar"
 FILE_EM_AARCH64_CORE_IMAGE="em-image-core-em-aarch64$ROOTFS_VERSION.tar"
+FILE_EM_AARCH64_CORE_IMAGE_SBOM="em-image-core-em-aarch64.sbom-cyclonedx_merged.json"
+DIR_CORE_IMAGE_SBOM="core-image-sbom"
 
 log_error_and_exit() {
 	echo >&2 "$1"; exit 1
@@ -82,10 +84,28 @@ copy_file() {
 	fi
 }
 
+# Snapshots and core images before v9.0.2 have no SBOM, the image is built without it then
+copy_core_image_sbom() {
+	local sbom_dir source_path
+	: "${TQEM_TMP_PATH:?not set}"
+	sbom_dir="$TQEM_TMP_PATH/$DIR_CORE_IMAGE_SBOM"
+	source_path="$TQEM_BASE_DEPLOY_PATH/$SUBDIR/emos/$EM_BUILD_REF/core-image/em-aarch64/$FILE_EM_AARCH64_CORE_IMAGE_SBOM"
+
+	mkdir -p "$sbom_dir"
+	if [ -e "$sbom_dir/$FILE_EM_AARCH64_CORE_IMAGE_SBOM" ]; then
+		echo "Using existing file: $sbom_dir/$FILE_EM_AARCH64_CORE_IMAGE_SBOM"
+	elif [ -e "$source_path" ]; then
+		cp -v "$source_path" "$sbom_dir/"
+	else
+		echo "No core image SBOM at $source_path, the image is built without it"
+	fi
+}
+
 copy_files() {
 	copy_file "$FILE_AARCH64_TOOLCHAIN"     toolchain/aarch64
 	copy_file "$FILE_EM_AARCH64_BOOTLOADER" core-image/em-aarch64
 	copy_file "$FILE_EM_AARCH64_CORE_IMAGE" core-image/em-aarch64
+	copy_core_image_sbom
 }
 
 case "$COMMAND" in

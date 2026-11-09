@@ -29,6 +29,7 @@ RUN apt-get update && apt-get -y upgrade && apt-get install -y \
 	python3-yaml \
 	rsync \
 	software-properties-common \
+	squashfs-tools \
 	sudo \
 	wget \
 	unzip
@@ -79,7 +80,8 @@ ENV PATH=/opt/venv/bin:/home/${DOCKER_USER}/.local/bin:$PATH
 RUN printf "tqemci ALL=(ALL) NOPASSWD:ALL\n" >> /etc/sudoers
 
 RUN python3 -m venv /opt/venv \
-	&& pip install python-gitlab==8.5.0 pyyaml==6.0.3
+	&& pip install python-gitlab==8.5.0 pyyaml==6.0.3 \
+	'cyclonedx-python-lib[json-validation]==11.12.0' packageurl-python==0.17.6
 
 # Enable to use the scripts in further images
 COPY ./scripts/*.sh /usr/local/bin/

@@ -16,3 +16,4 @@
     - .gitlab-runner-tag
   script:
     - make build
+    - make sbom

@@ -44,3 +44,20 @@ inside the root file system. The root file system as a whole is then compressed 
 
 ### Disable Firewall
 By setting the TQEM_BUNDLE_DISABLE_FIREWALL variable to 'true', the em-firewall service can be disabled.
+
+## sbom.mk
+The sbom target merges the app SBOMs of each bundle below deploy/bin with the core image SBOM into
+one CycloneDX file per bundle, with the layers bundle, apps and operating system. It creates no SBOM
+itself and runs after the build target. Apps without SBOM are listed in the output and in the
+property emos.apps_without_sbom.
+
+    make build sbom
+
+| Key                       | Default value                                    | Description                         |
+|---------------------------|--------------------------------------------------|-------------------------------------|
+| TQEM_CORE_IMAGE_SBOM_FILE | SBOM next to the core image in the aarch64 image | Core image SBOM to merge            |
+| TQEM_SBOM_PURL_EXCLUDES   | (empty)                                          | Leave out components whose purl contains one of these texts |
+| TQEM_SBOM_OUTPUT_PATH     | deploy/doc                                       | Folder of the merged SBOM files     |
+
+To merge with a locally built core image, point TQEM_CORE_IMAGE_SBOM_FILE to its
+em-image-core-<machine>.sbom-cyclonedx_merged.json.

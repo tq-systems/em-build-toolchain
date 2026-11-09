@@ -1,6 +1,9 @@
 ## [{{ version }}]
 ### Added
 - tests: shell unit test for the SBOM handling of yarn-push
+- bundles: sbom target merges the app SBOMs of each bundle and the core image SBOM into one CycloneDX
+  file in deploy/doc, the aarch64 image ships the core image SBOM and the bundle build job runs the target
+- docker/common: squashfs-tools, cyclonedx-python-lib and packageurl-python for the sbom target
 - docker/README.md: list of the images with their purpose
 - app and bundle producers place artifacts into a bin subfolder of the deploy tree, apps keep a flat
   compatibility symlink, preparing the unified deployment layout

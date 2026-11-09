@@ -40,6 +40,8 @@ RUN tar -C ${PATH_EMIT_EM_AARCH64} -xf ${TMP_EM_AARCH64_BOOTLOADER} && rm ${TMP_
 
 ARG PATH_EM_AARCH64_CORE_IMAGE
 COPY ${PATH_EM_AARCH64_CORE_IMAGE} ${PATH_EMIT_EM_AARCH64}/em-image-core-em-aarch64.tar
+# Holds the core image SBOM for the sbom target, or nothing if the core image has none
+COPY ./tmp/core-image-sbom/ ${PATH_EMIT_EM_AARCH64}/
 
 ARG DOCKER_USER
 USER ${DOCKER_USER}
