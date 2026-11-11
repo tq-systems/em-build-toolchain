@@ -33,8 +33,10 @@ go-license:
 	cd ${DIR_BACKEND} && em-go-licenses save . --force --save_path=${DIR_BACKEND_BUILD}/go-licenses
 	git restore ${DIR_BACKEND}/LICENSE
 
-go-sbom:
+go-sbom: go-license
 	cyclonedx-gomod app -json -output ${DIR_BACKEND_BUILD}/${APP_ID}.go-sbom.json ${DIR_BACKEND}
+	tqem-go-sbom-licenses ${DIR_BACKEND_BUILD}/${APP_ID}.go-sbom.json \
+		${DIR_BACKEND_BUILD}/${APP_ID}.golang.manifest
 
 go-push:
 	$(eval DIR_PKG_BIN = ${DIR_PACKAGE}/${BUILD_VARIANT}/pkg_root${DIR_APP_ROOT}/bin)
