@@ -79,6 +79,7 @@ ENV PATH=/opt/venv/bin:/home/${DOCKER_USER}/.local/bin:$PATH
 # We need to add 'tqemci' user for sudoers to enable it for the 'docker' user
 RUN printf "tqemci ALL=(ALL) NOPASSWD:ALL\n" >> /etc/sudoers
 
+# sbom.py names this venv in its shebang, the SDK environment of the aarch64 image puts its own python3 first
 RUN python3 -m venv /opt/venv \
 	&& pip install python-gitlab==8.5.0 pyyaml==6.0.3 \
 	'cyclonedx-python-lib[json-validation]==11.12.0' packageurl-python==0.17.6
