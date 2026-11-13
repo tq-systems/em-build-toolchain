@@ -1,6 +1,9 @@
 # Scripts
 
-Scripts copied to /usr/local/bin of every image.
+Scripts copied to /usr/local/bin of every image. Unit tests lie next to their script as test_*.py
+and stay out of the images like the Markdown files, see .dockerignore. A test runs on its own:
+
+    ./docker/usr/local/bin/test_sbom.py
 
 | Script | Purpose |
 |---|---|

@@ -17,8 +17,7 @@ import tarfile
 
 import pytest
 
-sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / "docker/usr/local/bin"))
-import sbom  # pylint: disable=wrong-import-position,import-error
+import sbom  # pylint: disable=import-error
 
 CORE_SBOM = {"components": [{
     "type": "library", "name": "busybox", "version": "1.36.1", "group": "core",
@@ -125,7 +124,9 @@ def test_rootfs_tar_is_the_em_image_archive(tmp_path):
     for name in ("customer-data.tar", "em-image-embase-em-aarch64.tar.xz"):
         (tmp_path / name).touch()
 
-    assert sbom.find_rootfs_tar(str(tmp_path)) == str(tmp_path / "em-image-embase-em-aarch64.tar.xz")
+    rootfs = sbom.find_rootfs_tar(str(tmp_path))
+
+    assert rootfs == str(tmp_path / "em-image-embase-em-aarch64.tar.xz")
 
 
 def test_apps_dir_reports_apps_without_sbom(tmp_path):
