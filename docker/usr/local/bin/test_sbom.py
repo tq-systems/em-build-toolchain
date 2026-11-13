@@ -67,12 +67,11 @@ def test_merge_builds_bundle_app_and_os_layers():
 def test_app_without_sbom_is_reported_by_name():
     merged, missing = sbom.merge({"presets": [], "backup": [app_sbom("pkg:npm/vue@3.4")]},
                                  CORE_SBOM)
-    sbom.add_metadata(merged, "embase-release-hw02xx-sw11.0.0", "11.0.0", "em-aarch64/tq-embase",
-                      missing)
+    sbom.add_metadata(merged, "embase", "11.0.0", "em-aarch64/tq-embase", missing)
 
     assert missing == ["presets"]
     assert "pkg:emos-app/presets" not in dependencies(merged)["em-bundle-root"]
-    assert merged["metadata"]["component"]["name"] == "embase-release-hw02xx EM Bundle"
+    assert merged["metadata"]["component"]["name"] == "embase EM Bundle"
     assert merged["metadata"]["component"]["version"] == "11.0.0"
     assert merged["serialNumber"].startswith("urn:uuid:")
     assert merged["properties"] == [
@@ -122,16 +121,6 @@ def test_rootfs_tar_with_compression_holds_the_apps_image(tmp_path):
     assert pathlib.Path(apps_image).read_bytes() == b"squashfs"
 
 
-@pytest.mark.parametrize("bundle_name", [
-    "demo-devel-hw0200-sw0.0.0+HEAD-20260215180319-f3dde35c",
-    "demo-devel-hw0200-latest"])
-def test_bundle_name_leaves_out_the_version(bundle_name):
-    merged, missing = sbom.merge({}, CORE_SBOM)
-    sbom.add_metadata(merged, bundle_name, "0.0.0", None, missing)
-
-    assert merged["metadata"]["component"]["name"] == "demo-devel-hw0200 EM Bundle"
-
-
 def test_rootfs_tar_is_the_em_image_archive(tmp_path):
     for name in ("customer-data.tar", "em-image-embase-em-aarch64.tar.xz"):
         (tmp_path / name).touch()
@@ -157,7 +146,8 @@ def test_apps_dir_reports_apps_without_sbom(tmp_path):
 
 def run_main(tmp_path, core_sbom):
     """Runs the script against the bundle directory tmp_path/bin."""
-    sbom.main(["--bundle-dir", str(tmp_path / "bin"), "--core-image-sbom", str(core_sbom),
+    sbom.main(["--bundle-dir", str(tmp_path / "bin"), "--bundle-name", "demo",
+               "--core-image-sbom", str(core_sbom),
                "--output-dir", str(tmp_path / "doc"), "--work-dir", str(tmp_path / "work")])
 
 

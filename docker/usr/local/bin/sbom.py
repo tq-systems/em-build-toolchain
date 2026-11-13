@@ -18,7 +18,6 @@ import argparse
 import datetime
 import json
 import os
-import re
 import shutil
 import subprocess
 import sys
@@ -26,9 +25,7 @@ import tarfile
 import uuid
 
 SPEC_VERSION = "1.6"
-BUNDLE_NAME = "EM Bundle"
-# Snapshot bundle files end in -latest, release bundle files in -sw<version>
-BUNDLE_FILE_VERSION = re.compile(r"-(latest|sw\d.*)$")
+ROOT_COMPONENT_NAME = "EM Bundle"
 TOOL_NAME = "sbom.py"
 ROOT_BOM_REF = "em-bundle-root"
 APP_PURL_PREFIX = "pkg:emos-app/"
@@ -201,7 +198,8 @@ class BundleSbom:
             "specVersion": SPEC_VERSION,
             "version": 1,
             "metadata": {
-                "component": {"type": "firmware", "name": BUNDLE_NAME, "bom-ref": ROOT_BOM_REF}
+                "component": {
+                    "type": "firmware", "name": ROOT_COMPONENT_NAME, "bom-ref": ROOT_BOM_REF}
             },
             "components": self.components,
             "dependencies": [{"ref": ROOT_BOM_REF, "dependsOn": self.root_refs}]
@@ -239,12 +237,12 @@ def merge(app_sboms, core_sbom, exclude_purls=()):
 def add_metadata(sbom, bundle_name, version, compatible, missing_apps):
     """Fills the CycloneDX metadata and keeps the EMOS specific values as properties.
 
-    The root component carries the bundle file name without its version, e.g.
-    "embase-release-hw02xx EM Bundle", and the bundle version.
+    The root component carries the BUNDLE_NAME of the bundle Makefile, e.g. "embase EM Bundle",
+    and the bundle version.
     """
     sbom["serialNumber"] = f"urn:uuid:{uuid.uuid4()}"
     metadata = sbom["metadata"]
-    metadata["component"]["name"] = f"{BUNDLE_FILE_VERSION.sub('', bundle_name)} {BUNDLE_NAME}"
+    metadata["component"]["name"] = f"{bundle_name} {ROOT_COMPONENT_NAME}"
     metadata["timestamp"] = datetime.datetime.now(datetime.timezone.utc).strftime(
         "%Y-%m-%dT%H:%M:%SZ")
     metadata["tools"] = {"components": [{"type": "application", "name": TOOL_NAME}]}
@@ -284,6 +282,7 @@ def main(argv=None):
     """Writes one merged SBOM per bundle in the bundle directory."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--bundle-dir", required=True, help="directory with the .raucb files")
+    parser.add_argument("--bundle-name", required=True, help="BUNDLE_NAME of the bundle Makefile")
     parser.add_argument("--core-image-sbom", required=True, help="CycloneDX SBOM of the core image")
     parser.add_argument("--output-dir", required=True, help="directory for <bundle>-sbom.json")
     parser.add_argument("--work-dir", required=True, help="scratch directory, emptied per bundle")
@@ -292,7 +291,7 @@ def main(argv=None):
     args = parser.parse_args(argv)
 
     try:
-        for name in ("bundle_dir", "core_image_sbom", "output_dir", "work_dir"):
+        for name in ("bundle_dir", "bundle_name", "core_image_sbom", "output_dir", "work_dir"):
             if not getattr(args, name):
                 raise SbomError(f"--{name.replace('_', '-')} is empty")
         if not os.path.isdir(args.bundle_dir):
@@ -307,16 +306,16 @@ def main(argv=None):
 
         os.makedirs(args.output_dir, exist_ok=True)
         for raucb in bundles:
-            bundle_name = os.path.splitext(raucb)[0]
-            work_dir = os.path.join(args.work_dir, bundle_name)
+            bundle_file = os.path.splitext(raucb)[0]
+            work_dir = os.path.join(args.work_dir, bundle_file)
             shutil.rmtree(work_dir, ignore_errors=True)
             os.makedirs(work_dir)
             version, compatible, app_sboms = extract_bundle(
                 os.path.join(args.bundle_dir, raucb), work_dir)
             sbom, missing_apps = merge(app_sboms, core_sbom, args.exclude_purl)
-            add_metadata(sbom, bundle_name, version, compatible, missing_apps)
+            add_metadata(sbom, args.bundle_name, version, compatible, missing_apps)
             validate(sbom)
-            output_file = os.path.join(args.output_dir, bundle_name + "-sbom.json")
+            output_file = os.path.join(args.output_dir, bundle_file + "-sbom.json")
             with open(output_file, "w", encoding="utf-8") as output:
                 json.dump(sbom, output, indent=4)
             report(sbom, missing_apps, output_file)

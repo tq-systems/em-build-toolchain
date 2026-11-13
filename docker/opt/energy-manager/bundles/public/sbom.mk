@@ -13,6 +13,7 @@ TQEM_SBOM_OUTPUT_PATH ?= ${TQEM_DEPLOY_DOC_PATH}
 
 sbom:
 	sbom.py --bundle-dir '${TQEM_DEPLOY_BIN_PATH}' \
+		--bundle-name '${BUNDLE_NAME}' \
 		--core-image-sbom '${TQEM_CORE_IMAGE_SBOM_FILE}' \
 		--output-dir '${TQEM_SBOM_OUTPUT_PATH}' \
 		--work-dir '${TQEM_TMP_PATH}/sbom' \
