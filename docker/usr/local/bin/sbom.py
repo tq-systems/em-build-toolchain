@@ -28,6 +28,7 @@ BUNDLE_NAME = "EMOS Bundle"
 ROOT_BOM_REF = "emos-bundle-root"
 APP_PURL_PREFIX = "pkg:emos-app/"
 OS_BOM_REF = "pkg:emos-os/core-image"
+ROOTFS_TAR_PREFIX = "em-image-"
 APPS_DIR = "opt/apps"
 APPS_IMAGE = "opt/apps.squashfs"
 SBOM_SUFFIX = "bom.json"
@@ -51,9 +52,12 @@ def read_manifest(bundle_dir):
 
 
 def find_rootfs_tar(bundle_dir):
-    """Returns the root file system archive of an extracted RAUC bundle."""
+    """Returns the root file system archive of an extracted RAUC bundle.
+
+    A bundle can hold further archives, the root file system is the one emit names em-image-*.
+    """
     for name in sorted(os.listdir(bundle_dir)):
-        if name.endswith((".tar", ".tar.xz")):
+        if name.startswith(ROOTFS_TAR_PREFIX) and name.endswith((".tar", ".tar.xz")):
             return os.path.join(bundle_dir, name)
     raise SbomError(f"no root file system archive in {bundle_dir}")
 

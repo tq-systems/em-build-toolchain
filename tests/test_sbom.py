@@ -118,6 +118,13 @@ def test_rootfs_tar_with_compression_holds_the_apps_image(tmp_path):
     assert pathlib.Path(apps_image).read_bytes() == b"squashfs"
 
 
+def test_rootfs_tar_is_the_em_image_archive(tmp_path):
+    for name in ("customer-data.tar", "em-image-embase-em-aarch64.tar.xz"):
+        (tmp_path / name).touch()
+
+    assert sbom.find_rootfs_tar(str(tmp_path)) == str(tmp_path / "em-image-embase-em-aarch64.tar.xz")
+
+
 def test_apps_dir_reports_apps_without_sbom(tmp_path):
     sbom_dir = tmp_path / "backup" / "sbom"
     sbom_dir.mkdir(parents=True)
