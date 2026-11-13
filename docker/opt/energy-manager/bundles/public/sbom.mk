@@ -1,6 +1,7 @@
 # Merges the app SBOMs of every bundle in the deploy tree with the core image SBOM into one
 # CycloneDX file per bundle. Run it after the build target.
 
+# TQEM_MACHINE names the device (e.g. em4xx), the path below needs its Yocto machine (em-aarch64)
 SBOM_MACHINE = $(shell tqem-device.sh machine ${TQEM_MACHINE})
 
 # The aarch64 image ships the SBOM of its core image next to it. Point the variable to another
