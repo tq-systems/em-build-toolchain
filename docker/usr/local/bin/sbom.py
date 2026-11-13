@@ -29,7 +29,7 @@ ROOT_BOM_REF = "emos-bundle-root"
 APP_PURL_PREFIX = "pkg:emos-app/"
 OS_BOM_REF = "pkg:emos-os/core-image"
 ROOTFS_TAR_PREFIX = "em-image-"
-APPS_DIR = "opt/apps"
+APPS_DIR = "opt/apps/"
 APPS_IMAGE = "opt/apps.squashfs"
 SBOM_SUFFIX = "bom.json"
 MERGED_COMPONENT_FIELDS = (
@@ -79,7 +79,7 @@ def read_rootfs_tar(tar_path, work_dir):
             if name == APPS_IMAGE:
                 tar.extract(member, work_dir, filter="data")
                 apps_image = os.path.join(work_dir, APPS_IMAGE)
-            elif name.startswith(APPS_DIR + "/"):
+            elif name.startswith(APPS_DIR):
                 docs = app_sboms.setdefault(name.split("/")[2], [])
                 if member.isfile() and name.endswith(SBOM_SUFFIX):
                     docs.append(json.load(tar.extractfile(member)))
