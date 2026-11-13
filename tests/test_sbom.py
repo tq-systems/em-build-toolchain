@@ -104,17 +104,19 @@ def test_rootfs_tar_without_compression_holds_the_apps(tmp_path):
     app_sboms, apps_image = sbom.read_rootfs_tar(str(rootfs), str(tmp_path / "work"))
 
     assert apps_image is None
-    assert app_sboms == {"backup": [app_sbom("pkg:npm/vue@3.4")], "presets": []}
+    assert app_sboms == {"opt/apps/backup": [app_sbom("pkg:npm/vue@3.4")], "opt/apps/presets": []}
 
 
 def test_rootfs_tar_with_compression_holds_the_apps_image(tmp_path):
     rootfs = tmp_path / "rootfs.tar"
     with tarfile.open(rootfs, "w") as tar:
         add_file(tar, "./opt/apps.squashfs", b"squashfs")
+        add_file(tar, "./opt/uncompressed-app/sbom/app.go-sbom.json",
+                 json.dumps(app_sbom("pkg:golang/example@1.0")).encode())
 
     app_sboms, apps_image = sbom.read_rootfs_tar(str(rootfs), str(tmp_path / "work"))
 
-    assert app_sboms == {}
+    assert app_sboms == {"opt/uncompressed-app": [app_sbom("pkg:golang/example@1.0")]}
     assert pathlib.Path(apps_image).read_bytes() == b"squashfs"
 
 
@@ -130,11 +132,13 @@ def test_apps_dir_reports_apps_without_sbom(tmp_path):
     sbom_dir.mkdir(parents=True)
     (sbom_dir / "backup.go-sbom.json").write_text(json.dumps(app_sbom("pkg:npm/vue@3.4")))
     (tmp_path / "presets").mkdir()
-    # emit links an uncompressed app out of the apps image
+    # emit links an uncompressed app out of the apps image to opt/<app> of the root file system
     (tmp_path / "uncompressed-app").symlink_to("../uncompressed-app")
+    rootfs_sboms = {"opt/uncompressed-app": [app_sbom("pkg:golang/example@1.0")]}
 
-    assert sbom.read_apps_dir(str(tmp_path)) == {
-        "backup": [app_sbom("pkg:npm/vue@3.4")], "presets": [], "uncompressed-app": []}
+    assert sbom.read_apps_dir(str(tmp_path), rootfs_sboms) == {
+        "backup": [app_sbom("pkg:npm/vue@3.4")], "presets": [],
+        "uncompressed-app": [app_sbom("pkg:golang/example@1.0")]}
 
 
 def run_main(tmp_path, core_sbom):

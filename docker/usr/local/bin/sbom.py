@@ -29,6 +29,7 @@ ROOT_BOM_REF = "emos-bundle-root"
 APP_PURL_PREFIX = "pkg:emos-app/"
 OS_BOM_REF = "pkg:emos-os/core-image"
 ROOTFS_TAR_PREFIX = "em-image-"
+OPT_DIR = "opt/"
 APPS_DIR = "opt/apps/"
 APPS_IMAGE = "opt/apps.squashfs"
 SBOM_SUFFIX = "bom.json"
@@ -63,13 +64,15 @@ def find_rootfs_tar(bundle_dir):
 
 
 def read_rootfs_tar(tar_path, work_dir):
-    """Collects the app SBOMs from the root file system archive of a bundle.
+    """Collects the SBOMs below opt from the root file system archive of a bundle.
 
-    Without compression the apps lie below opt/apps in the archive. With compression they lie in
-    opt/apps.squashfs, which is extracted to work_dir and returned as second value.
+    Without compression the apps lie below opt/apps. With compression they lie in
+    opt/apps.squashfs, which is extracted to work_dir and returned as second value. An app that
+    emit installs uncompressed lies below opt/<app>, the apps image links to it.
 
     Returns:
-        tuple: (dict app name -> list of SBOM documents, path of the apps image or None)
+        tuple: (dict app directory like opt/apps/<app> -> list of SBOM documents,
+                path of the apps image or None)
     """
     app_sboms = {}
     apps_image = None
@@ -79,23 +82,29 @@ def read_rootfs_tar(tar_path, work_dir):
             if name == APPS_IMAGE:
                 tar.extract(member, work_dir, filter="data")
                 apps_image = os.path.join(work_dir, APPS_IMAGE)
-            elif name.startswith(APPS_DIR):
-                docs = app_sboms.setdefault(name.split("/")[2], [])
+            elif name.startswith(OPT_DIR):
+                depth = 3 if name.startswith(APPS_DIR) else 2
+                docs = app_sboms.setdefault("/".join(name.split("/")[:depth]), [])
                 if member.isfile() and name.endswith(SBOM_SUFFIX):
                     docs.append(json.load(tar.extractfile(member)))
     return app_sboms, apps_image
 
 
-def read_apps_dir(apps_dir):
+def read_apps_dir(apps_dir, rootfs_sboms):
     """Collects the app SBOMs below an extracted apps image, one top-level entry per app.
 
-    An app that emit installs uncompressed is a symlink out of the image and is reported as an
-    app without SBOM.
+    An app that emit installs uncompressed is a symlink to opt/<app> of the root file system,
+    its SBOMs come from rootfs_sboms.
     """
     app_sboms = {}
     for app in sorted(os.listdir(apps_dir)):
+        app_path = os.path.join(apps_dir, app)
+        if os.path.islink(app_path):
+            target = os.path.normpath(os.path.join(APPS_DIR, os.readlink(app_path)))
+            app_sboms[app] = rootfs_sboms.get(target, [])
+            continue
         docs = app_sboms[app] = []
-        for root, dirs, files in os.walk(os.path.join(apps_dir, app)):
+        for root, dirs, files in os.walk(app_path):
             dirs.sort()
             for name in sorted(files):
                 if name.endswith(SBOM_SUFFIX):
@@ -109,12 +118,13 @@ def extract_bundle(raucb_path, work_dir):
     bundle_dir = os.path.join(work_dir, "bundle")
     subprocess.run(["unsquashfs", "-q", "-no-progress", "-d", bundle_dir, raucb_path], check=True)
     version, compatible = read_manifest(bundle_dir)
-    app_sboms, apps_image = read_rootfs_tar(find_rootfs_tar(bundle_dir), work_dir)
-    if apps_image:
-        apps_dir = os.path.join(work_dir, "apps")
-        subprocess.run(["unsquashfs", "-q", "-no-progress", "-d", apps_dir, apps_image], check=True)
-        app_sboms.update(read_apps_dir(apps_dir))
-    return version, compatible, app_sboms
+    rootfs_sboms, apps_image = read_rootfs_tar(find_rootfs_tar(bundle_dir), work_dir)
+    if not apps_image:
+        return version, compatible, {path[len(APPS_DIR):]: docs for path, docs
+                                     in rootfs_sboms.items() if path.startswith(APPS_DIR)}
+    apps_dir = os.path.join(work_dir, "apps")
+    subprocess.run(["unsquashfs", "-q", "-no-progress", "-d", apps_dir, apps_image], check=True)
+    return version, compatible, read_apps_dir(apps_dir, rootfs_sboms)
 
 
 def cpe_to_purl(cpe, version):
