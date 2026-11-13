@@ -38,7 +38,7 @@ RUN apt-get update && apt-get -y upgrade && apt-get install -y \
 # we have to add the nodesource repository (via the nodesource setup script)
 # and get their nodejs package.
 ARG NODE_RELEASE=24
-ARG NODE_VERSION=24.22.1
+ARG NODE_VERSION=24.22.2
 RUN curl -fsSL https://deb.nodesource.com/setup_${NODE_RELEASE}.x | bash -
 RUN apt-get install -y nodejs=${NODE_VERSION}-1nodesource1 && apt-mark hold nodejs
 

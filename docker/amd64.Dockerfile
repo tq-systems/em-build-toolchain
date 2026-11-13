@@ -31,7 +31,7 @@ RUN apt-get update && apt-get -y upgrade \
 	python3-absl \
 && apt-get autoremove --yes && apt-get clean --yes
 
-ARG GO_VERSION=1.27.3
+ARG GO_VERSION=1.27.4
 RUN wget -c -nv https://go.dev./dl/go${GO_VERSION}.linux-amd64.tar.gz -O - \
 	| tar -xz -C /usr/local
 
