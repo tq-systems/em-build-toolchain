@@ -18,6 +18,7 @@ import argparse
 import datetime
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -25,9 +26,11 @@ import tarfile
 import uuid
 
 SPEC_VERSION = "1.6"
-BUNDLE_NAME = "EMOS Bundle"
+BUNDLE_NAME = "EM Bundle"
+# Snapshot bundle files end in -latest, release bundle files in -sw<version>
+BUNDLE_FILE_VERSION = re.compile(r"-(latest|sw\d.*)$")
 TOOL_NAME = "sbom.py"
-ROOT_BOM_REF = "emos-bundle-root"
+ROOT_BOM_REF = "em-bundle-root"
 APP_PURL_PREFIX = "pkg:emos-app/"
 OS_BOM_REF = "pkg:emos-os/core-image"
 ROOTFS_TAR_PREFIX = "em-image-"
@@ -233,10 +236,15 @@ def merge(app_sboms, core_sbom, exclude_purls=()):
     return bundle.document(), sorted(name for name, docs in app_sboms.items() if not docs)
 
 
-def add_metadata(sbom, version, compatible, missing_apps):
-    """Fills the CycloneDX metadata and keeps the EMOS specific values as properties."""
+def add_metadata(sbom, bundle_name, version, compatible, missing_apps):
+    """Fills the CycloneDX metadata and keeps the EMOS specific values as properties.
+
+    The root component carries the bundle file name without its version, e.g.
+    "embase-release-hw02xx EM Bundle", and the bundle version.
+    """
     sbom["serialNumber"] = f"urn:uuid:{uuid.uuid4()}"
     metadata = sbom["metadata"]
+    metadata["component"]["name"] = f"{BUNDLE_FILE_VERSION.sub('', bundle_name)} {BUNDLE_NAME}"
     metadata["timestamp"] = datetime.datetime.now(datetime.timezone.utc).strftime(
         "%Y-%m-%dT%H:%M:%SZ")
     metadata["tools"] = {"components": [{"type": "application", "name": TOOL_NAME}]}
@@ -306,7 +314,7 @@ def main(argv=None):
             version, compatible, app_sboms = extract_bundle(
                 os.path.join(args.bundle_dir, raucb), work_dir)
             sbom, missing_apps = merge(app_sboms, core_sbom, args.exclude_purl)
-            add_metadata(sbom, version, compatible, missing_apps)
+            add_metadata(sbom, bundle_name, version, compatible, missing_apps)
             validate(sbom)
             output_file = os.path.join(args.output_dir, bundle_name + "-sbom.json")
             with open(output_file, "w", encoding="utf-8") as output:

@@ -49,7 +49,7 @@ def test_merge_builds_bundle_app_and_os_layers():
 
     assert missing == []
     deps = dependencies(merged)
-    assert deps["emos-bundle-root"] == [
+    assert deps["em-bundle-root"] == [
         "pkg:emos-app/backup", "pkg:emos-app/flow-control", "pkg:emos-os/core-image"]
     assert deps["pkg:emos-app/flow-control"] == ["pkg:golang/x/net@0.29", "pkg:npm/vue@3.4"]
     assert deps["pkg:emos-app/backup"] == ["pkg:golang/x/net@0.29"]
@@ -67,10 +67,12 @@ def test_merge_builds_bundle_app_and_os_layers():
 def test_app_without_sbom_is_reported_by_name():
     merged, missing = sbom.merge({"presets": [], "backup": [app_sbom("pkg:npm/vue@3.4")]},
                                  CORE_SBOM)
-    sbom.add_metadata(merged, "11.0.0", "em-aarch64/tq-embase", missing)
+    sbom.add_metadata(merged, "embase-release-hw02xx-sw11.0.0", "11.0.0", "em-aarch64/tq-embase",
+                      missing)
 
     assert missing == ["presets"]
-    assert "pkg:emos-app/presets" not in dependencies(merged)["emos-bundle-root"]
+    assert "pkg:emos-app/presets" not in dependencies(merged)["em-bundle-root"]
+    assert merged["metadata"]["component"]["name"] == "embase-release-hw02xx EM Bundle"
     assert merged["metadata"]["component"]["version"] == "11.0.0"
     assert merged["serialNumber"].startswith("urn:uuid:")
     assert merged["properties"] == [
@@ -118,6 +120,16 @@ def test_rootfs_tar_with_compression_holds_the_apps_image(tmp_path):
 
     assert app_sboms == {"opt/uncompressed-app": [app_sbom("pkg:golang/example@1.0")]}
     assert pathlib.Path(apps_image).read_bytes() == b"squashfs"
+
+
+@pytest.mark.parametrize("bundle_name", [
+    "demo-devel-hw0200-sw0.0.0+HEAD-20260215180319-f3dde35c",
+    "demo-devel-hw0200-latest"])
+def test_bundle_name_leaves_out_the_version(bundle_name):
+    merged, missing = sbom.merge({}, CORE_SBOM)
+    sbom.add_metadata(merged, bundle_name, "0.0.0", None, missing)
+
+    assert merged["metadata"]["component"]["name"] == "demo-devel-hw0200 EM Bundle"
 
 
 def test_rootfs_tar_is_the_em_image_archive(tmp_path):
