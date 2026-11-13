@@ -68,14 +68,15 @@ def test_merge_builds_bundle_app_and_os_layers():
 def test_app_without_sbom_is_reported_by_name():
     merged, missing = sbom.merge({"presets": [], "backup": [app_sbom("pkg:npm/vue@3.4")]},
                                  CORE_SBOM)
-    sbom.add_properties(merged, "11.0.0", "em-aarch64/tq-embase", missing)
+    sbom.add_metadata(merged, "11.0.0", "em-aarch64/tq-embase", missing)
 
     assert missing == ["presets"]
     assert "pkg:emos-app/presets" not in dependencies(merged)["emos-bundle-root"]
-    properties = {prop["name"]: prop["value"] for prop in merged["properties"]}
-    assert properties["emos.apps_without_sbom"] == "presets"
-    assert properties["emos.version"] == "11.0.0"
-    assert properties["statistics.app_components.backup"] == "1"
+    assert merged["metadata"]["component"]["version"] == "11.0.0"
+    assert merged["serialNumber"].startswith("urn:uuid:")
+    assert merged["properties"] == [
+        {"name": "emos.compatible", "value": "em-aarch64/tq-embase"},
+        {"name": "emos.apps_without_sbom", "value": "presets"}]
 
 
 def test_excluded_purls_leave_components_and_dependencies():

@@ -22,9 +22,11 @@ import shutil
 import subprocess
 import sys
 import tarfile
+import uuid
 
 SPEC_VERSION = "1.6"
 BUNDLE_NAME = "EMOS Bundle"
+TOOL_NAME = "sbom.py"
 ROOT_BOM_REF = "emos-bundle-root"
 APP_PURL_PREFIX = "pkg:emos-app/"
 OS_BOM_REF = "pkg:emos-os/core-image"
@@ -231,55 +233,18 @@ def merge(app_sboms, core_sbom, exclude_purls=()):
     return bundle.document(), sorted(name for name, docs in app_sboms.items() if not docs)
 
 
-def license_names(component):
-    """Yields the license ids and expressions of a component."""
-    for entry in component.get("licenses", []):
-        if "expression" in entry:
-            yield entry["expression"]
-        elif "id" in entry.get("license", {}):
-            yield entry["license"]["id"]
-
-
-def add_properties(sbom, version, compatible, missing_apps):
-    """Adds generation data and statistics as CycloneDX properties."""
-    components = sbom["components"]
-    type_stats, purl_stats, license_stats = {}, {}, {}
-    for component in components:
-        component_type = component.get("type", "unknown")
-        type_stats[component_type] = type_stats.get(component_type, 0) + 1
-        purl = component.get("purl", "")
-        if purl.startswith("pkg:"):
-            purl_type = purl.split(":")[1].split("/")[0]
-            purl_stats[purl_type] = purl_stats.get(purl_type, 0) + 1
-        for name in license_names(component):
-            license_stats[name] = license_stats.get(name, 0) + 1
-    app_counts = {dep["ref"][len(APP_PURL_PREFIX):]: len(dep["dependsOn"])
-                  for dep in sbom["dependencies"] if dep["ref"].startswith(APP_PURL_PREFIX)}
-
-    properties = [
-        ("sbom.generated", datetime.datetime.now(datetime.timezone.utc)
-         .strftime("%Y-%m-%dT%H:%M:%S.%fZ")),
-        ("sbom.generator", "sbom.py v2.0"),
-        ("sbom.tools", "cyclonedx-gomod,yarn,npm,unsquashfs"),
-        ("emos.version", version),
-        ("emos.compatible", compatible),
-        ("emos.apps_without_sbom", ",".join(missing_apps)),
-        ("statistics.total_components", len(components)),
-        ("statistics.total_dependencies", len(sbom["dependencies"])),
-        ("statistics.total_applications", type_stats.get("application", 0)),
-        ("statistics.total_libraries", type_stats.get("library", 0)),
-        ("statistics.unique_licenses", len(license_stats)),
-    ]
-    properties += [(f"statistics.components_by_type.{name}", count)
-                   for name, count in sorted(type_stats.items())]
-    properties += [(f"statistics.components_by_package.{name}", count)
-                   for name, count in sorted(purl_stats.items())]
-    properties += [(f"statistics.app_components.{name}", count) for name, count in
-                   sorted(app_counts.items(), key=lambda item: item[1], reverse=True)[:5]]
-    properties += [(f"statistics.licenses.{name}", count) for name, count in
-                   sorted(license_stats.items(), key=lambda item: item[1], reverse=True)[:10]]
-    sbom["properties"] = [{"name": name, "value": str(value)}
-                          for name, value in properties if value not in (None, "")]
+def add_metadata(sbom, version, compatible, missing_apps):
+    """Fills the CycloneDX metadata and keeps the EMOS specific values as properties."""
+    sbom["serialNumber"] = f"urn:uuid:{uuid.uuid4()}"
+    metadata = sbom["metadata"]
+    metadata["timestamp"] = datetime.datetime.now(datetime.timezone.utc).strftime(
+        "%Y-%m-%dT%H:%M:%SZ")
+    metadata["tools"] = {"components": [{"type": "application", "name": TOOL_NAME}]}
+    if version:
+        metadata["component"]["version"] = version
+    properties = {"emos.compatible": compatible, "emos.apps_without_sbom": ",".join(missing_apps)}
+    sbom["properties"] = [{"name": name, "value": value}
+                          for name, value in properties.items() if value]
 
 
 def validate(sbom):
@@ -341,7 +306,7 @@ def main(argv=None):
             version, compatible, app_sboms = extract_bundle(
                 os.path.join(args.bundle_dir, raucb), work_dir)
             sbom, missing_apps = merge(app_sboms, core_sbom, args.exclude_purl)
-            add_properties(sbom, version, compatible, missing_apps)
+            add_metadata(sbom, version, compatible, missing_apps)
             validate(sbom)
             output_file = os.path.join(args.output_dir, bundle_name + "-sbom.json")
             with open(output_file, "w", encoding="utf-8") as output:
