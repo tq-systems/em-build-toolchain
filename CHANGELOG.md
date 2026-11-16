@@ -1,3 +1,9 @@
+## [5.1.1] - 2026-11-16
+### Changed
+- common/amd64: patch update for Node and Go
+- em-build: update to v9.1.3
+- Updated copyright license and file headers
+
 ## [5.1.0] - 2026-10-30
 ### Changed
 - docker/amd64: update Go and golangci-lint
