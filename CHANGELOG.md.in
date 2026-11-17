@@ -5,6 +5,8 @@
   compatibility symlink, preparing the unified deployment layout
 - app build archives are placed into the src subfolder of the deploy tree
 - new deploy-rc target deploys immutably into the release-candidates tree
+- apps/service.mk: all service settings can be set in the app makefile before or after the include;
+  settings with an empty value are left out of the service file; new SERVICE_GROUP and SERVICE_RESTART
 
 ### Changed
 - Updated copyright license and file headers

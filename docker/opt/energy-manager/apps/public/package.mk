@@ -47,12 +47,12 @@ empkg-license: empkg-prepare
 	install -d ${DIR_PKG_LICENSE}
 	install -m 644 LICENSE ${DIR_PKG_LICENSE}
 
-	echo "$$README_GENERAL"      > ${DIR_PKG_LICENSE}/README
+	printf '%b\n' "$$README_GENERAL" > ${DIR_PKG_LICENSE}/README
 	if [ -f ${DIR_PKG_LICENSE}/${APP_ID}.golang.manifest ]; then \
-		echo "$$README_GOLANG"  >> ${DIR_PKG_LICENSE}/README; \
+		printf '%b\n' "$$README_GOLANG" >> ${DIR_PKG_LICENSE}/README; \
 	fi
 	if [ -f ${DIR_PKG_LICENSE}/${APP_ID}.frontend.licenses ]; then \
-		echo "$$README_FRONTEND_LICENSES" >> ${DIR_PKG_LICENSE}/README; \
+		printf '%b\n' "$$README_FRONTEND_LICENSES" >> ${DIR_PKG_LICENSE}/README; \
 	fi
 
 empkg-firewall: empkg-prepare
@@ -66,7 +66,7 @@ ifneq ($(FILE_EM_FW_CONF),)
 	install -m 644 ${FILE_EM_FW_CONF} ${DIR_PKG_ROOT_APP}/em-fw.conf
 else
 ifneq ($(and $(EM_FW_ALLOW_PROTOCOL),$(EM_FW_ALLOW_PORT)),)
-	echo "$$SIMPLE_FW_CONFIG" > ${DIR_PKG_ROOT_APP}/em-fw.conf
+	printf '%b\n' "$$SIMPLE_FW_CONFIG" > ${DIR_PKG_ROOT_APP}/em-fw.conf
 endif
 endif
 
