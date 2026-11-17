@@ -70,14 +70,22 @@ directly and no symlink is created. Tag builds always carry the version. Nothing
 this, the toolchain derives it from TQEM_CI and TQEM_GIT_TAG.
 
 ## service.mk
-This Makefile generates the systemd service file of the package.
+This Makefile generates the systemd service file of the package. The settings marked as optional
+are left out of the service file when the variable is empty. Each default value can be overwritten
+by local Makefile definitions.
 
-| Key                   | Default value                  | Description                                    |
-|-----------------------|--------------------------------|------------------------------------------------|
-| SERVICE_USER          | ${APP_NAME}                    | Set User in systemd service file               |
-| SERVICE_EXTRA_UNIT    | (empty)                        | Extend default unit in systemd service file    |
-| SERVICE_EXTRA_SERVICE | (empty)                        | Extend default service in systemd service file |
-| SERVICE_CONTENT       | (Collection of default values) | Entire content of systemd service file         |
+| Key                   | Default value                          | Description                                              |
+|-----------------------|----------------------------------------|----------------------------------------------------------|
+| SERVICE_START         | ${SERVICE_EXEC} ${SERVICE_OPTS_SOCKET} | Set the command line how to start the package (optional) |
+| SERVICE_USER          | ${APP_NAME}                            | Set User in systemd service file (optional)              |
+| SERVICE_GROUP         | (empty)                                | Set Group in systemd service file (optional)             |
+| SERVICE_RESTART       | always                                 | Set Restart in systemd service file (optional)           |
+| SERVICE_DEPENDS       | mosquitto.service                      | Set Wants and After in systemd service file (optional)   |
+| SERVICE_WORKING_DIR   | /cfglog/apps/${APP_ID}                 | Sets the directory the app starts in (optional)          |
+| SERVICE_EXTRA_UNIT    | (empty)                                | Extend default unit in systemd service file              |
+| SERVICE_EXTRA_SERVICE | (empty)                                | Extend default service in systemd service file           |
+| SERVICE_EXTRA_INSTALL | (empty)                                | Extend install section in systemd service file (optional)|
+| SERVICE_CONTENT       | (Collection of default values)         | Entire content of systemd service file                   |
 
 ## manifest.mk
 This Makefile generates the `manifest.json` of the package, including the path permissions (see
