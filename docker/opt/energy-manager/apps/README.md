@@ -62,7 +62,15 @@ This Makefile provides the Go (Golang) backend build.
 This Makefile provides yarn frontend build.
 
 ## package.mk
-This Makefile provides the Energy Manager package build (*.empkg).
+This Makefile provides the Energy Manager package build (*.empkg). It includes `service.mk` and `manifest.mk`.
+
+A local build names the package after its version and adds a `_latest_` symlink next to it. A
+snapshot pipeline overwrites its target folder in place, so there the package is named `_latest_`
+directly and no symlink is created. Tag builds always carry the version. Nothing has to be set for
+this, the toolchain derives it from TQEM_CI and TQEM_GIT_TAG.
+
+## service.mk
+This Makefile generates the systemd service file of the package.
 
 | Key                   | Default value                  | Description                                    |
 |-----------------------|--------------------------------|------------------------------------------------|
@@ -71,10 +79,9 @@ This Makefile provides the Energy Manager package build (*.empkg).
 | SERVICE_EXTRA_SERVICE | (empty)                        | Extend default service in systemd service file |
 | SERVICE_CONTENT       | (Collection of default values) | Entire content of systemd service file         |
 
-A local build names the package after its version and adds a `_latest_` symlink next to it. A
-snapshot pipeline overwrites its target folder in place, so there the package is named `_latest_`
-directly and no symlink is created. Tag builds always carry the version. Nothing has to be set for
-this, the toolchain derives it from TQEM_CI and TQEM_GIT_TAG.
+## manifest.mk
+This Makefile generates the `manifest.json` of the package, including the path permissions (see
+[Path permissions](#path-permissions)) and the [App classification](#app-classification).
 
 ## App user privileges
 The most important aspect of app sandboxing is not granting root privileges. The toolchain will
