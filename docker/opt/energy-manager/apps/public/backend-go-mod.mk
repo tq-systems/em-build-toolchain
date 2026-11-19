@@ -39,12 +39,13 @@ go-sbom:
 go-push:
 	$(eval DIR_PKG_BIN = ${DIR_PACKAGE}/${BUILD_VARIANT}/pkg_root${DIR_APP_ROOT}/bin)
 	$(eval DIR_PKG_LICENSE = ${DIR_PACKAGE}/${BUILD_VARIANT}/pkg_root${DIR_APP_ROOT}/license)
-	$(eval DIR_PKG_SBOM = ${DIR_PACKAGE}/${BUILD_VARIANT}/pkg_root${DIR_APP_ROOT}/sbom)
-	mkdir -p ${DIR_PKG_BIN} ${DIR_PKG_LICENSE} ${DIR_PKG_SBOM}
+	mkdir -p ${DIR_PKG_BIN} ${DIR_PKG_LICENSE} ${TQEM_DEPLOY_DOC_PATH}
 
 	install -m755 ${DIR_BACKEND_BUILD}/${FEATURE_VARIANT}/${APP_NAME} ${DIR_PKG_BIN}/${APP_NAME}
 	install -m644 ${DIR_BACKEND_BUILD}/${APP_ID}.golang.manifest ${DIR_PKG_LICENSE}
-	install -m644 ${DIR_BACKEND_BUILD}/${APP_ID}.go-sbom.json ${DIR_PKG_SBOM}
+	# The SBOM is documentation and stays out of the package, it is deployed below doc/
+	install -m644 ${DIR_BACKEND_BUILD}/${APP_ID}.go-sbom.json \
+		${TQEM_DEPLOY_DOC_PATH}/${APP_ID}${APP_ID_SUFFIX}.go-sbom.json
 	cp -r ${DIR_BACKEND_BUILD}/go-licenses ${DIR_PKG_LICENSE}
 
 go-clean:

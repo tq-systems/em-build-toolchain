@@ -25,8 +25,7 @@ yarn-release: ${DIR_NODE_MODULES}
 yarn-push:
 	$(eval DIR_PKG_WWW = ${DIR_PACKAGE}/${BUILD_VARIANT}/pkg_root${DIR_APP_ROOT}/www)
 	$(eval DIR_PKG_LICENSE = ${DIR_PACKAGE}/${BUILD_VARIANT}/pkg_root${DIR_APP_ROOT}/license)
-	$(eval DIR_PKG_SBOM = ${DIR_PACKAGE}/${BUILD_VARIANT}/pkg_root${DIR_APP_ROOT}/sbom)
-	mkdir -p ${DIR_PKG_WWW} ${DIR_PKG_LICENSE} ${DIR_PKG_SBOM}
+	mkdir -p ${DIR_PKG_WWW} ${DIR_PKG_LICENSE} ${TQEM_DEPLOY_DOC_PATH}
 
 	rsync --recursive --force \
 		--exclude 'cyclonedx' --exclude '.well-known' --exclude 'ThirdPartyNotice.txt' \
@@ -35,13 +34,14 @@ yarn-push:
 	cp ${DIR_FRONTEND_BUILD}/${BUILD_VARIANT}/ThirdPartyNotice.txt \
 		${DIR_PKG_LICENSE}/${APP_ID}.frontend.licenses
 
+	# The SBOM is documentation and stays out of the package, it is deployed below doc/
 	# TODO: Remove fallback after implementing SBOM generation for all applications
 	if [ -f ${DIR_FRONTEND_BUILD}/${BUILD_VARIANT}/cyclonedx/bom.json ]; then \
-		cp ${DIR_FRONTEND_BUILD}/${BUILD_VARIANT}/cyclonedx/bom.json \
-			${DIR_PKG_SBOM}/${APP_ID}.frontend-sbom.json; \
+		install -m644 ${DIR_FRONTEND_BUILD}/${BUILD_VARIANT}/cyclonedx/bom.json \
+			${TQEM_DEPLOY_DOC_PATH}/${APP_ID}${APP_ID_SUFFIX}.frontend-sbom.json; \
 	else \
 		echo "Warning: Cannot find SBOM for ${APP_ID} with ${BUILD_VARIANT} variant."; \
-		echo "The shipping of the SBOM file to the empkg is skipped."; \
+		echo "The deployment of the SBOM file below doc/ is skipped."; \
 	fi
 
 yarn-clean:
