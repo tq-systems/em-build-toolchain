@@ -1,5 +1,6 @@
 ## [{{ version }}]
 ### Added
+- tests: shell unit test for the SBOM handling of yarn-push
 - docker/README.md: list of the images with their purpose
 - app and bundle producers place artifacts into a bin subfolder of the deploy tree, apps keep a flat
   compatibility symlink, preparing the unified deployment layout
@@ -20,6 +21,8 @@
 - common/amd64: patch update for Node and Go
 
 ### Fixed
+- apps: a frontend without a software bill of materials no longer breaks yarn-push, the build
+  warns and continues
 - version.mk: a tag build takes its version from its own tag, even if the commit carries further
   tags
 - docker/amd64: update Go and golangci-lint
