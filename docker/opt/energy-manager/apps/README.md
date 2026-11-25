@@ -61,6 +61,12 @@ This Makefile provides the Go (Golang) backend build.
 ## frontend-yarn.mk
 This Makefile provides yarn frontend build.
 
+The frontend build creates a CycloneDX software bill of materials with `rollup-plugin-sbom`.
+The plugin writes it to its default path `cyclonedx/bom.json` below the build output
+directory, and `yarn-push` ships it with the package. A frontend built without the plugin
+has no bill of materials: the build prints a warning and continues, so apps can be migrated
+one at a time.
+
 ## package.mk
 This Makefile provides the Energy Manager package build (*.empkg).
 

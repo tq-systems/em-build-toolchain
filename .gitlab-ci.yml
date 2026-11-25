@@ -20,6 +20,11 @@ Shell Linter:
     - .lint-shell
     - .rule-include-development-branches
 
+Shell Unit Tests:
+  extends:
+    - .shell-unit-tests
+    - .rule-include-development-branches
+
 Test All Builds:
   extends:
     - .docker-build

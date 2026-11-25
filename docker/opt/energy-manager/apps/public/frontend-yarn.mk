@@ -40,8 +40,8 @@ yarn-push:
 		cp ${DIR_FRONTEND_BUILD}/${BUILD_VARIANT}/cyclonedx/bom.json \
 			${DIR_PKG_SBOM}/${APP_ID}.frontend-sbom.json; \
 	else \
-		@echo "Warning: Cannot find SBOM for ${APP_ID} with ${BUILD_VARIANT} variant."; \
-		@echo "The shipping of the SBOM file to the empkg is skipped."; \
+		echo "Warning: Cannot find SBOM for ${APP_ID} with ${BUILD_VARIANT} variant."; \
+		echo "The shipping of the SBOM file to the empkg is skipped."; \
 	fi
 
 yarn-clean:
