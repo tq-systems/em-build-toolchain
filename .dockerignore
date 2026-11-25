@@ -1,4 +1,2 @@
 .git
-**/test_*.py
 **/*.md
-**/__pycache__

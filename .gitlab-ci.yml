@@ -25,11 +25,6 @@ Shell Unit Tests:
     - .shell-unit-tests
     - .rule-include-development-branches
 
-Python Unit Tests:
-  extends:
-    - .python-unit-tests
-    - .rule-include-development-branches
-
 Test All Builds:
   extends:
     - .docker-build
