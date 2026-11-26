@@ -32,6 +32,7 @@ fi
 FILE_AARCH64_TOOLCHAIN="emos-x86_64-aarch64-toolchain$VERSION.sh"
 FILE_EM_AARCH64_BOOTLOADER="em-image-core-em-aarch64$VERSION.bootloader.tar"
 FILE_EM_AARCH64_CORE_IMAGE="em-image-core-em-aarch64$ROOTFS_VERSION.tar"
+FILE_EM_AARCH64_CORE_IMAGE_SBOM="em-image-core-em-aarch64.sbom-cyclonedx_merged.json"
 
 log_error_and_exit() {
 	echo >&2 "$1"; exit 1
@@ -59,6 +60,7 @@ set_env() {
 	set_env_file PATH_AARCH64_TOOLCHAIN     "$FILE_AARCH64_TOOLCHAIN"
 	set_env_file PATH_EM_AARCH64_BOOTLOADER "$FILE_EM_AARCH64_BOOTLOADER"
 	set_env_file PATH_EM_AARCH64_CORE_IMAGE "$FILE_EM_AARCH64_CORE_IMAGE"
+	set_env_file PATH_EM_AARCH64_CORE_IMAGE_SBOM "$FILE_EM_AARCH64_CORE_IMAGE_SBOM"
 }
 
 copy_file() {
@@ -86,6 +88,7 @@ copy_files() {
 	copy_file "$FILE_AARCH64_TOOLCHAIN"     toolchain/aarch64
 	copy_file "$FILE_EM_AARCH64_BOOTLOADER" core-image/em-aarch64
 	copy_file "$FILE_EM_AARCH64_CORE_IMAGE" core-image/em-aarch64
+	copy_file "$FILE_EM_AARCH64_CORE_IMAGE_SBOM" core-image/em-aarch64
 }
 
 case "$COMMAND" in

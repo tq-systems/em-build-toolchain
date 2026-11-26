@@ -16,3 +16,17 @@
     - .gitlab-runner-tag
   script:
     - make build
+
+# Runs apart from the build, so a failing SBOM does not stop the tests of the bundle
+.build-bundle-sbom:
+  stage: test
+  extends:
+    - .image-aarch64
+    - .gitlab-runner-tag
+  artifacts:
+    name: $ARTIFACT_REF
+    expire_in: 1 week
+    paths:
+      - $DEPLOY_DIR/doc
+  script:
+    - make sbom

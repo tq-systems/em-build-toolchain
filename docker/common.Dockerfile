@@ -29,6 +29,7 @@ RUN apt-get update && apt-get -y upgrade && apt-get install -y \
 	python3-yaml \
 	rsync \
 	software-properties-common \
+	squashfs-tools \
 	sudo \
 	wget \
 	unzip
@@ -81,6 +82,11 @@ RUN printf "tqemci ALL=(ALL) NOPASSWD:ALL\n" >> /etc/sudoers
 RUN python3 -m venv /opt/venv \
 	&& pip install python-gitlab==8.5.0 pyyaml==6.0.3
 
+# The executables of the library land in the venv, with its python3 in their shebang. The SDK
+# environment of the aarch64 image puts its own python3 first, that one lacks the dependencies.
+ENV LIB_PYTHON_VERSION=1.0.0
+RUN pip install "tqem @ git+https://github.com/tq-systems/em-lib-python@v${LIB_PYTHON_VERSION}"
+
 # Enable to use the scripts in further images
 COPY ./scripts/*.sh /usr/local/bin/
 
@@ -97,7 +103,8 @@ RUN git clone https://github.com/tq-systems/em-lib-shell /tmp/libshell \
 # labels and can be read back from the built image
 LABEL tqem.tool.node="${NODE_VERSION}" \
 	tqem.tool.yarn="${YARN_VERSION}" \
-	tqem.tool.lib-shell="${LIB_SHELL_VERSION}"
+	tqem.tool.lib-shell="${LIB_SHELL_VERSION}" \
+	tqem.tool.lib-python="${LIB_PYTHON_VERSION}"
 
 # Placed last so a changing BUILD_TAG does not invalidate the cache of the
 # expensive layers above

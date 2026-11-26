@@ -40,6 +40,9 @@ RUN tar -C ${PATH_EMIT_EM_AARCH64} -xf ${TMP_EM_AARCH64_BOOTLOADER} && rm ${TMP_
 
 ARG PATH_EM_AARCH64_CORE_IMAGE
 COPY ${PATH_EM_AARCH64_CORE_IMAGE} ${PATH_EMIT_EM_AARCH64}/em-image-core-em-aarch64.tar
+# The sbom target merges the bundle SBOMs with this file
+ARG PATH_EM_AARCH64_CORE_IMAGE_SBOM
+COPY ${PATH_EM_AARCH64_CORE_IMAGE_SBOM} ${PATH_EMIT_EM_AARCH64}/em-image-core-em-aarch64.sbom-cyclonedx_merged.json
 
 ARG DOCKER_USER
 USER ${DOCKER_USER}
