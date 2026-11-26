@@ -9,8 +9,8 @@
 # In case of any license issues please contact license@tq-group.com.
 #
 
-# Tests for the SBOM handling in yarn-push: a frontend built with the SBOM plugin ships its
-# bill of materials, a frontend built without the plugin warns instead of failing.
+# Tests for the SBOM handling in yarn-push: a frontend built with the SBOM plugin deploys its
+# bill of materials below doc/, a frontend built without the plugin warns instead of failing.
 
 SCRIPT_DIR="$(realpath "$(dirname "$0")")"
 MAKEFILE="${SCRIPT_DIR}/../docker/opt/energy-manager/apps/public/frontend-yarn.mk"
@@ -44,10 +44,11 @@ run_yarn_push() {
 		DIR_PACKAGE="${tmpdir}/package" \
 		DIR_APP_ROOT="$DIR_APP_ROOT" \
 		BUILD_VARIANT="$BUILD_VARIANT" \
-		APP_ID="$APP_ID" 2>&1
+		APP_ID="$APP_ID" \
+		TQEM_DEPLOY_DOC_PATH="${tmpdir}/deploy/doc" 2>&1
 }
 
-# --- A frontend built with the plugin ships its SBOM ---
+# --- A frontend built with the plugin deploys its SBOM ---
 TMPDIR_WITH="$(mktemp -d)"
 TMPDIR_WITHOUT="$(mktemp -d)"
 # Empty paths would make the cleanup delete from the root directory
@@ -61,11 +62,17 @@ else
 	cat "${TMPDIR_WITH}/log"
 fi
 
-SBOM_IN_PACKAGE="${TMPDIR_WITH}/package/${BUILD_VARIANT}/pkg_root${DIR_APP_ROOT}/sbom/${APP_ID}.frontend-sbom.json"
-if [[ -f "$SBOM_IN_PACKAGE" ]]; then
-	pass 'SBOM is shipped from the default path cyclonedx/bom.json'
+SBOM_IN_DOC="${TMPDIR_WITH}/deploy/doc/${APP_ID}.frontend-sbom.json"
+if [[ -f "$SBOM_IN_DOC" ]]; then
+	pass 'SBOM is deployed below doc from the default path cyclonedx/bom.json'
 else
-	fail 'SBOM is shipped from the default path cyclonedx/bom.json'
+	fail 'SBOM is deployed below doc from the default path cyclonedx/bom.json'
+fi
+
+if [[ ! -e "${TMPDIR_WITH}/package/${BUILD_VARIANT}/pkg_root${DIR_APP_ROOT}/sbom" ]]; then
+	pass 'SBOM stays out of the package'
+else
+	fail 'SBOM stays out of the package'
 fi
 
 # --- A frontend built without the plugin warns and keeps building ---
@@ -83,10 +90,10 @@ else
 	cat "${TMPDIR_WITHOUT}/log"
 fi
 
-if [[ ! -e "${TMPDIR_WITHOUT}/package/${BUILD_VARIANT}/pkg_root${DIR_APP_ROOT}/sbom/${APP_ID}.frontend-sbom.json" ]]; then
-	pass 'no SBOM is shipped when the frontend has none'
+if [[ ! -e "${TMPDIR_WITHOUT}/deploy/doc/${APP_ID}.frontend-sbom.json" ]]; then
+	pass 'no SBOM is deployed when the frontend has none'
 else
-	fail 'no SBOM is shipped when the frontend has none'
+	fail 'no SBOM is deployed when the frontend has none'
 fi
 
 exit "$RETURN_CODE"

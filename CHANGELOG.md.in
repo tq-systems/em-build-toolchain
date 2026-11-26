@@ -19,6 +19,7 @@
   source archive build from it
 - the source archive of a snapshot pipeline is named <app>_latest.tar.gz, like the package
 - common/amd64: patch update for Node and Go
+- app SBOMs are deployed below doc/ instead of shipping inside the empkg
 
 ### Fixed
 - apps: a frontend without a software bill of materials no longer breaks yarn-push, the build
