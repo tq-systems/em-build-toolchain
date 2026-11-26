@@ -5,6 +5,7 @@
   CycloneDX file in deploy/doc, the aarch64 image ships the core image SBOM and the CI template
   .build-bundle-sbom runs the target
 - docker/common: the Python library tqem v1.0.0 and squashfs-tools for the sbom target
+- go-mod apps: the Go SBOM lists the license of each module, taken from the go-licenses manifest
 - docker/README.md: list of the images with their purpose
 - app and bundle producers place artifacts into a bin subfolder of the deploy tree, apps keep a flat
   compatibility symlink, preparing the unified deployment layout
