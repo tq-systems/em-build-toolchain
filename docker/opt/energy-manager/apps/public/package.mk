@@ -1,54 +1,10 @@
-ESSENTIAL ?= 0
-AUTOSTART ?= 1
+# Service file and manifest generation, service.mk must come first (manifest.mk needs SERVICE_RUN_DIR)
+include /opt/energy-manager/apps/public/service.mk
+include /opt/energy-manager/apps/public/manifest.mk
 
 APP_FILE_SUFFIX = empkg
 # Extends the app ID for the empkg file (e.g. for variants)
 APP_ID_SUFFIX ?=
-
-SERVICE_USER            ?= ${APP_NAME}
-SERVICE_WORKING_DIR     = /cfglog/apps/${APP_ID}
-SERVICE_RUN_APP_DIR     ?= ${APP_ID}
-SERVICE_RUN_DIR         = /run/em/apps/${SERVICE_RUN_APP_DIR}
-SERVICE_FILE            = ${APP_NAME}.service
-SERVICE_EXEC            = ${DIR_APP_ROOT}/bin/${APP_NAME}
-SERVICE_OPTS_SOCKET     = -listenprotocol unix -listen ${SERVICE_RUN_DIR}/socket -listengroup www
-SERVICE_START           = ${SERVICE_EXEC} ${SERVICE_OPTS_SOCKET}
-SERVICE_DEPENDS         = mosquitto.service
-SERVICE_INSTALL_SECTION = $(if $(strip $(SERVICE_EXTRA_INSTALL)),\n[Install]\n$(SERVICE_EXTRA_INSTALL))
-
-export define SERVICE_CONTENT
-[Unit]
-Description=EM app: ${APP_PRETTY_NAME}
-Wants=${SERVICE_DEPENDS}
-Before=nginx.service
-After=${SERVICE_DEPENDS}
-${SERVICE_EXTRA_UNIT}
-
-[Service]
-ExecStart=${SERVICE_START}
-User=${SERVICE_USER}
-Restart=always
-RestartSec=3
-RestartSteps=5
-RestartMaxDelaySec=30min
-WorkingDirectory=${SERVICE_WORKING_DIR}
-${SERVICE_EXTRA_SERVICE}
-$(SERVICE_INSTALL_SECTION)
-endef
-
-MANIFEST_JSON = { \
-	id: $$id, \
-	version: $$version, \
-	arch: $$arch, \
-	appclass: (if $$appclass != "" then $$appclass else null end), \
-	essential: (if $$essential == 1 then true else null end), \
-	autostart: (if $$autostart == 0 then false else null end), \
-	variant: (if $$variant != "" then $$variant else null end), \
-	min_sys_mem: (if $$sysmem_bytes != "" then $$sysmem_bytes else null end), \
-	name: $$name, \
-	description: $$description, \
-	lang: $$lang \
-}
 
 EM_FW_ALLOW_DIRECTION ?= inbound
 export define SIMPLE_FW_CONFIG
@@ -86,70 +42,18 @@ empkg-prepare:
 	$(eval DIR_PKG_ROOT_APP = ${DIR_PACKAGE}/${BUILD_VARIANT}/pkg_root${DIR_APP_ROOT})
 	mkdir -p ${DIR_PKG_ARCHIVE} ${DIR_PKG_ROOT_APP}
 
-empkg-service: empkg-prepare
-ifneq ($(SERVICE_BUILD),0)
-	echo "$$SERVICE_CONTENT" > ${DIR_PKG_ROOT_APP}/${SERVICE_FILE}
-endif
-
 empkg-license: empkg-prepare
 	$(eval DIR_PKG_LICENSE = ${DIR_PKG_ROOT_APP}/license)
 	install -d ${DIR_PKG_LICENSE}
 	install -m 644 LICENSE ${DIR_PKG_LICENSE}
 
-	echo "$$README_GENERAL"      > ${DIR_PKG_LICENSE}/README
+	printf '%b\n' "$$README_GENERAL" > ${DIR_PKG_LICENSE}/README
 	if [ -f ${DIR_PKG_LICENSE}/${APP_ID}.golang.manifest ]; then \
-		echo "$$README_GOLANG"  >> ${DIR_PKG_LICENSE}/README; \
+		printf '%b\n' "$$README_GOLANG" >> ${DIR_PKG_LICENSE}/README; \
 	fi
 	if [ -f ${DIR_PKG_LICENSE}/${APP_ID}.frontend.licenses ]; then \
-		echo "$$README_FRONTEND_LICENSES" >> ${DIR_PKG_LICENSE}/README; \
+		printf '%b\n' "$$README_FRONTEND_LICENSES" >> ${DIR_PKG_LICENSE}/README; \
 	fi
-
-MANIFEST_DEFAULT_OWN_PATHS = \
-	"${SERVICE_RUN_DIR}" \
-	"/cfglog/apps/${APP_ID}"
-
-# Prevent a recursive reference error by using ':='
-MANIFEST_OWN_PATHS := ${MANIFEST_DEFAULT_OWN_PATHS} ${MANIFEST_OWN_PATHS}
-MANIFEST_RW_PATHS ?=
-MANIFEST_RO_PATHS ?=
-
-MANIFEST_EXTRA_PATTERN = { \
-"permissions": { \
-    "own": $$manifest_own_json, \
-    "rw": $$manifest_rw_json, \
-    "ro": $$manifest_ro_json  \
-  } \
-}
-# transform bash-lists to json
-args2json = $(shell jq -nc '$$ARGS.positional' --args $(1))
-
-ifeq ($(APPCLASS),)
-$(warning '${APP_ID}' does not define APPCLASS. Setting 'no-time' as default. Please update Makefile.)
-APPCLASS = no-time
-endif
-
-empkg-manifest: empkg-prepare
-	$(eval MANIFEST_EXTRA_JSON = $(shell jq -c --argjson manifest_own_json '$(call args2json,$(MANIFEST_OWN_PATHS))' \
-						--argjson manifest_rw_json '$(call args2json,$(MANIFEST_RW_PATHS))' \
-						--argjson manifest_ro_json '$(call args2json,$(MANIFEST_RO_PATHS))' \
-						-n '${MANIFEST_EXTRA_PATTERN}'))
-	$(eval SYSMEM_BYTES = $(shell echo $(MIN_SYS_MEM) | numfmt --from=iec --invalid=ignore))
-
-	jq -nc \
-		--arg id '${APP_ID}' \
-		--arg version '${VERSION}' \
-		--arg arch '${PKG_ARCH}' \
-		--arg appclass '${APPCLASS}' \
-		--argjson essential '${ESSENTIAL}' \
-		--argjson autostart '${AUTOSTART}' \
-		--arg variant '${BUILD_VARIANT}' \
-		--arg sysmem_bytes '${SYSMEM_BYTES}' \
-		--arg name '${APP_PRETTY_NAME}' \
-		--arg description '${DESCRIPTION}' \
-		--arg lang '${LANG_VARIANT}' \
-		--argjson manifest_extra '${MANIFEST_EXTRA_JSON}' \
-		'(${MANIFEST_JSON} | with_entries(select(.value != null))) * $$manifest_extra' \
-	> ${DIR_PKG_ARCHIVE}/manifest.json
 
 empkg-firewall: empkg-prepare
 ifdef FILE_EM_FW_CONF
@@ -162,7 +66,7 @@ ifneq ($(FILE_EM_FW_CONF),)
 	install -m 644 ${FILE_EM_FW_CONF} ${DIR_PKG_ROOT_APP}/em-fw.conf
 else
 ifneq ($(and $(EM_FW_ALLOW_PROTOCOL),$(EM_FW_ALLOW_PORT)),)
-	echo "$$SIMPLE_FW_CONFIG" > ${DIR_PKG_ROOT_APP}/em-fw.conf
+	printf '%b\n' "$$SIMPLE_FW_CONFIG" > ${DIR_PKG_ROOT_APP}/em-fw.conf
 endif
 endif
 
@@ -224,5 +128,5 @@ empkg: $$(EMPKG_PREREQS)
 empkg-clean:
 	rm -rf ${DIR_PACKAGE}
 
-.PHONY: empkg-prepare empkg-service empkg-license empkg-manifest empkg-firewall empkg-dbus-conf \
-	empkg-data empkg-build empkg empkg-clean
+.PHONY: empkg-prepare empkg-license empkg-firewall empkg-dbus-conf empkg-data \
+	empkg-build empkg empkg-clean

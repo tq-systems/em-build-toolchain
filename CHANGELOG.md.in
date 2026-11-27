@@ -11,6 +11,10 @@
   compatibility symlink, preparing the unified deployment layout
 - app build archives are placed into the src subfolder of the deploy tree
 - new deploy-rc target deploys immutably into the release-candidates tree
+- apps/service.mk: all service settings can be set in the app makefile before or after the include;
+  settings with an empty value are left out of the service file; new SERVICE_GROUP and SERVICE_RESTART
+- apps/service.mk: RUNTIME_RW_PATHS and RUNTIME_RO_PATHS grant the app access to files that other
+  units create at runtime, RUNTIME_DEPENDS names these units
 
 ### Changed
 - ci: base CI templates v4.1.0
@@ -26,6 +30,7 @@
 - the source archive of a snapshot pipeline is named <app>_latest.tar.gz, like the package
 - common/amd64: patch update for Node and Go
 - app SBOMs are deployed below doc/ instead of shipping inside the empkg
+- apps/package.mk: service file and manifest generation moved to service.mk and manifest.mk
 
 ### Fixed
 - apps: a frontend without a software bill of materials no longer breaks yarn-push, the build

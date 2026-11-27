@@ -68,19 +68,34 @@ has no bill of materials: the build prints a warning and continues, so apps can 
 one at a time.
 
 ## package.mk
-This Makefile provides the Energy Manager package build (*.empkg).
-
-| Key                   | Default value                  | Description                                    |
-|-----------------------|--------------------------------|------------------------------------------------|
-| SERVICE_USER          | ${APP_NAME}                    | Set User in systemd service file               |
-| SERVICE_EXTRA_UNIT    | (empty)                        | Extend default unit in systemd service file    |
-| SERVICE_EXTRA_SERVICE | (empty)                        | Extend default service in systemd service file |
-| SERVICE_CONTENT       | (Collection of default values) | Entire content of systemd service file         |
+This Makefile provides the Energy Manager package build (*.empkg). It includes `service.mk` and `manifest.mk`.
 
 A local build names the package after its version and adds a `_latest_` symlink next to it. A
 snapshot pipeline overwrites its target folder in place, so there the package is named `_latest_`
 directly and no symlink is created. Tag builds always carry the version. Nothing has to be set for
 this, the toolchain derives it from TQEM_CI and TQEM_GIT_TAG.
+
+## service.mk
+This Makefile generates the systemd service file of the package. The settings marked as optional
+are left out of the service file when the variable is empty. Each default value can be overwritten
+by local Makefile definitions.
+
+| Key                   | Default value                          | Description                                              |
+|-----------------------|----------------------------------------|----------------------------------------------------------|
+| SERVICE_START         | ${SERVICE_EXEC} ${SERVICE_OPTS_SOCKET} | Set the command line how to start the package (optional) |
+| SERVICE_USER          | ${APP_NAME}                            | Set User in systemd service file (optional)              |
+| SERVICE_GROUP         | (empty)                                | Set Group in systemd service file (optional)             |
+| SERVICE_RESTART       | always                                 | Set Restart in systemd service file (optional)           |
+| SERVICE_DEPENDS       | mosquitto.service                      | Set Wants and After in systemd service file (optional)   |
+| SERVICE_WORKING_DIR   | /cfglog/apps/${APP_ID}                 | Sets the directory the app starts in (optional)          |
+| SERVICE_EXTRA_UNIT    | (empty)                                | Extend default unit in systemd service file              |
+| SERVICE_EXTRA_SERVICE | (empty)                                | Extend default service in systemd service file           |
+| SERVICE_EXTRA_INSTALL | (empty)                                | Extend install section in systemd service file (optional)|
+| SERVICE_CONTENT       | (Collection of default values)         | Entire content of systemd service file                   |
+
+## manifest.mk
+This Makefile generates the `manifest.json` of the package, including the path permissions (see
+[Path permissions](#path-permissions)) and the [App classification](#app-classification).
 
 ## App user privileges
 The most important aspect of app sandboxing is not granting root privileges. The toolchain will
@@ -142,6 +157,45 @@ MANIFEST_RO_PATHS = \
 ```
 
 The toolchain places a JSON-formatted list of all permission requirements in the app manifest.
+The runtime tools grant `rwx` (read/write) or `r-x` (read-only) to these paths and their current contents
+when the app is initialized (installation or boot). Paths that already exist at that time, such as the 'own'
+directories of other apps, are therefore granted via `MANIFEST_RW_PATHS` and `MANIFEST_RO_PATHS`.
+
+Paths that another unit creates only while it is running (e.g. a socket) do not exist at that time and cannot
+be granted via the manifest. For these paths, the app makefile can request access for its service user via
+`RUNTIME_RW_PATHS` and `RUNTIME_RO_PATHS`. The toolchain then adds `SetCredential` / `ExecStartPre` entries to
+the service file, which set the ACL entries (`rwx` or `r-x`, as above) on every service start:
+```
+RUNTIME_RW_PATHS = /run/em/apps/device-settings/example-file
+RUNTIME_RO_PATHS = /run/em/etc/nftables.d/foo.conf
+RUNTIME_DEPENDS = em-app-device-settings.service em-firewall.service
+```
+Several paths or units are separated by spaces. The units that create the files belong in `RUNTIME_DEPENDS`
+(full unit names). They are added as `Requires=` and `After=`, so that this app starts after them. Other
+dependencies, such as `Before=`, can be set directly via `SERVICE_EXTRA_UNIT`.
+
+For an app `foo`, the example above results in these entries in the service file:
+```
+[Unit]
+Requires=em-app-device-settings.service em-firewall.service
+After=em-app-device-settings.service em-firewall.service
+
+[Service]
+SetCredential=tmpfiles.extra:a+ /run/em/apps/device-settings/example-file - - - - u:em-app-foo:rwx,m::rwx\na+ /run/em/etc/nftables.d/foo.conf - - - - u:em-app-foo:r-x,m::rwx\n
+ExecStartPre=+/usr/bin/systemd-tmpfiles --create --prefix=/run/em/apps/device-settings/example-file --prefix=/run/em/etc/nftables.d/foo.conf
+```
+
+How it works:
+- `SetCredential=` hands the service a credential named `tmpfiles.extra`. Its value is a small tmpfiles.d
+  configuration, one line per path. systemd turns each `\n` into a line break.
+- `ExecStartPre=` runs `systemd-tmpfiles` as root (`+`) before the app starts. `systemd-tmpfiles` reads the
+  `tmpfiles.extra` credential like an extra configuration file. The `--prefix` options limit it to the listed
+  paths, so it does not apply the rest of the system's tmpfiles.d configuration.
+- Each line `a+ <path> - - - - u:<user>:<permissions>,m::rwx` adds an ACL entry for the service user and keeps
+  the existing entries (`a+`). `m::rwx` opens the ACL mask, which would otherwise limit the new entry.
+
+A path that does not exist at service start is skipped silently, and the ACL entry is lost when the file is
+recreated later. Without these variables, the service file gets no ACL entries.
 
 ## App classification
 
