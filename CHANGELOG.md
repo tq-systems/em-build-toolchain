@@ -1,3 +1,13 @@
+## [5.1.2] - 2026-11-28
+### Added
+- apps/service.mk: all service settings can be set in the app makefile before or after the include;
+  settings with an empty value are left out of the service file; new SERVICE_GROUP and SERVICE_RESTART
+- apps/service.mk: RUNTIME_RW_PATHS and RUNTIME_RO_PATHS grant the app access to files that other
+  units create at runtime, RUNTIME_DEPENDS names these units
+
+### Changed
+- apps/package.mk: service file and manifest generation moved to service.mk and manifest.mk
+
 ## [5.1.1] - 2026-11-16
 ### Changed
 - common/amd64: patch update for Node and Go
